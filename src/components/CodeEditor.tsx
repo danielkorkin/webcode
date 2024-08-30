@@ -6,11 +6,15 @@ const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
 interface EditorProps {
 	language: "html" | "css" | "javascript";
-	label: string;
+	content: string;
 	onChange: (value: string) => void;
 }
 
-export default function CodeEditor({ language, label, onChange }: EditorProps) {
+export default function CodeEditor({
+	language,
+	content,
+	onChange,
+}: EditorProps) {
 	const handleEditorChange = (value: string | undefined) => {
 		if (value) {
 			onChange(value);
@@ -19,10 +23,10 @@ export default function CodeEditor({ language, label, onChange }: EditorProps) {
 
 	return (
 		<div>
-			<label className="block text-lg font-bold mb-2">{label}</label>
 			<Editor
-				height="300px"
+				height="400px"
 				language={language}
+				value={content}
 				theme="vs-dark"
 				onChange={handleEditorChange}
 			/>

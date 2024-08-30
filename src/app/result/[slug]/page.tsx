@@ -5,26 +5,42 @@ import { useParams } from "next/navigation";
 
 export default function ResultPage() {
 	const { slug } = useParams();
-	const [code, setCode] = useState<{
-		html: string;
-		css: string;
-		js: string;
-	} | null>(null);
+	const [files, setFiles] = useState<
+		{ name: string; content: string; type: "html" | "css" | "javascript" }[]
+	>([]);
 
 	useEffect(() => {
-		const savedCode = localStorage.getItem(slug!);
-		if (savedCode) {
-			setCode(JSON.parse(savedCode));
+		const savedFiles = localStorage.getItem(slug!);
+		if (savedFiles) {
+			setFiles(JSON.parse(savedFiles));
 		}
 	}, [slug]);
 
-	if (!code) return <div>Loading...</div>;
+	const renderHTML = () => {
+		const htmlFile = files.find((file) => file.type === "html");
+		const cssFiles = files.filter((file) => file.type === "css");
+		const jsFiles = files.filter((file) => file.type === "javascript");
 
-	return (
-		<div className="result">
-			<style>{code.css}</style>
-			<div dangerouslySetInnerHTML={{ __html: code.html }} />
-			<script dangerouslySetInnerHTML={{ __html: code.js }} />
-		</div>
-	);
+		if (!htmlFile) return "No HTML file found.";
+
+		return (
+			<>
+				{cssFiles.map((file) => (
+					<style
+						key={file.name}
+						dangerouslySetInnerHTML={{ __html: file.content }}
+					/>
+				))}
+				<div dangerouslySetInnerHTML={{ __html: htmlFile.content }} />
+				{jsFiles.map((file) => (
+					<script
+						key={file.name}
+						dangerouslySetInnerHTML={{ __html: file.content }}
+					/>
+				))}
+			</>
+		);
+	};
+
+	return <div className="result">{renderHTML()}</div>;
 }
