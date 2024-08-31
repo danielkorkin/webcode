@@ -8,25 +8,22 @@ import Sidebar from "@/components/Sidebar";
 import FileList from "@/components/FileList";
 import FileTabs from "@/components/FileTabs";
 import SettingsPopup from "@/components/SettingsPopup";
+import Marketplace from "@/components/Marketplace";
 import CodeEditor from "@/components/CodeEditor";
 
-// Dynamically import the monaco-editor to prevent SSR issues
 const MonacoEditor = dynamic(() => import("monaco-editor"), { ssr: false });
 
 export default function Home() {
-	const [files, setFiles] = useState<
-		{ name: string; content: string; type: "html" | "css" | "javascript" }[]
-	>([]);
-	const [openFiles, setOpenFiles] = useState<
-		{ name: string; content: string; type: "html" | "css" | "javascript" }[]
-	>([]);
+	const [files, setFiles] = useState([]);
+	const [openFiles, setOpenFiles] = useState([]);
 	const [activeFile, setActiveFile] = useState<number | null>(null);
 	const [isFileListOpen, setIsFileListOpen] = useState(false);
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-	const [theme, setTheme] = useState("vs-dark"); // Default theme is dark
+	const [isMarketplaceOpen, setIsMarketplaceOpen] = useState(false);
+	const [extensions, setExtensions] = useState([]);
+	const [theme, setTheme] = useState("vs-dark");
 	const router = useRouter();
 
-	// Load theme from localStorage on client side and set monaco-editor theme
 	useEffect(() => {
 		let isMounted = true;
 		const loadMonaco = async () => {
@@ -40,13 +37,11 @@ export default function Home() {
 			}
 		};
 		loadMonaco();
-
 		return () => {
 			isMounted = false;
 		};
 	}, []);
 
-	// Save theme to localStorage whenever it changes and update monaco editor theme
 	useEffect(() => {
 		const updateTheme = async () => {
 			if (typeof window !== "undefined") {
@@ -60,25 +55,18 @@ export default function Home() {
 		updateTheme();
 	}, [theme]);
 
-	const handleAddFile = (
-		name: string,
-		type: "html" | "css" | "javascript"
-	) => {
+	const handleAddFile = (name: string, type: string) => {
 		const newFile = { name, content: "", type };
-		const updatedFiles = [...files, newFile];
-		setFiles(updatedFiles);
-
-		const fileIndex = updatedFiles.length - 1;
-		handleOpenFile(fileIndex);
+		setFiles([...files, newFile]);
+		handleOpenFile(files.length);
 	};
 
 	const handleFileChange = (index: number, content: string) => {
 		const updatedFiles = [...files];
 		updatedFiles[index].content = content;
 		setFiles(updatedFiles);
-
 		const openIndex = openFiles.findIndex(
-			(file) => file.name === updatedFiles[index].name
+			(file) => file.name === updatedFiles[index].name,
 		);
 		if (openIndex !== -1) {
 			const updatedOpenFiles = [...openFiles];
@@ -92,7 +80,7 @@ export default function Home() {
 		if (!fileToOpen) return;
 
 		const alreadyOpen = openFiles.findIndex(
-			(file) => file.name === fileToOpen.name
+			(file) => file.name === fileToOpen.name,
 		);
 
 		if (alreadyOpen === -1) {
@@ -121,13 +109,7 @@ export default function Home() {
 		}
 	};
 
-	const handleImport = (
-		importedFiles: {
-			name: string;
-			content: string;
-			type: "html" | "css" | "javascript";
-		}[]
-	) => {
+	const handleImport = (importedFiles: any[]) => {
 		setFiles(importedFiles);
 		setActiveFile(importedFiles.length > 0 ? 0 : null);
 	};
@@ -150,6 +132,78 @@ export default function Home() {
 		setTheme(newTheme);
 	};
 
+	const handleInstallExtension = (extension: any) => {
+		const isAlreadyInstalled = extensions.some(
+			(ext) => ext.value === extension.value,
+		);
+		if (!isAlreadyInstalled) {
+			setExtensions([...extensions, extension]);
+		}
+	};
+
+	const handleToggleExtension = (value: string) => {
+		setExtensions(
+			extensions.map((ext) =>
+				ext.value === value ? { ...ext, enabled: !ext.enabled } : ext,
+			),
+		);
+	};
+
+	const handleToggleMarketplace = () => {
+		setIsMarketplaceOpen(!isMarketplaceOpen);
+	};
+
+	const handleExecuteFile = async (extensionValue: string, file: string) => {
+		try {
+			const extModule = await import(
+				`@/extensions/${extensionValue}/${file}`
+			);
+			if (extModule && extModule.default) {
+				extModule.default({
+					files,
+					setFiles,
+					activeFile,
+					setActiveFile,
+				});
+			}
+		} catch (error) {
+			console.error(
+				`Failed to load file ${file} from extension ${extensionValue}:`,
+				error,
+			);
+		}
+	};
+
+	useEffect(() => {
+		const loadEnabledExtensions = async () => {
+			for (const extension of extensions) {
+				if (extension.enabled) {
+					for (const file of extension.files) {
+						try {
+							const extModule = await import(
+								`@/extensions/${extension.value}/${file}`
+							);
+							if (extModule && extModule.default) {
+								extModule.default({
+									files,
+									setFiles,
+									activeFile,
+									setActiveFile,
+								});
+							}
+						} catch (error) {
+							console.error(
+								`Failed to load file ${file} from extension ${extension.value}:`,
+								error,
+							);
+						}
+					}
+				}
+			}
+		};
+		loadEnabledExtensions();
+	}, [extensions]);
+
 	return (
 		<div
 			className={`flex h-screen ${
@@ -165,14 +219,22 @@ export default function Home() {
 					onImport={handleImport}
 					onExport={handleExport}
 					onRun={handleRun}
-					onOpenSettings={() => setIsSettingsOpen(true)} // Open settings
-					theme={theme} // Pass theme to sidebar for dynamic styling
+					onOpenSettings={() => setIsSettingsOpen(true)}
+					onOpenMarketplace={handleToggleMarketplace}
+					theme={theme}
 				/>
 				{isFileListOpen && (
 					<FileList
 						files={files}
 						onOpenFile={handleOpenFile}
-						theme={theme} // Pass theme to file list
+						theme={theme}
+					/>
+				)}
+				{isMarketplaceOpen && (
+					<Marketplace
+						onInstallExtension={handleInstallExtension}
+						installedExtensions={extensions} // Pass installed extensions
+						theme={theme}
 					/>
 				)}
 			</div>
@@ -186,7 +248,7 @@ export default function Home() {
 					activeFile={activeFile}
 					onSelectFile={setActiveFile}
 					onCloseFile={handleCloseFile}
-					theme={theme} // Pass theme to file tabs
+					theme={theme}
 				/>
 				<div
 					className="flex-1 overflow-auto"
@@ -196,15 +258,15 @@ export default function Home() {
 						<CodeEditor
 							language={openFiles[activeFile].type}
 							content={openFiles[activeFile].content}
-							theme={theme} // Pass theme to the editor
+							theme={theme}
 							onChange={(content) =>
 								handleFileChange(
 									files.findIndex(
 										(f) =>
 											f.name ===
-											openFiles[activeFile].name
+											openFiles[activeFile].name,
 									),
-									content
+									content,
 								)
 							}
 						/>
@@ -216,6 +278,10 @@ export default function Home() {
 				onClose={() => setIsSettingsOpen(false)}
 				onThemeChange={handleThemeChange}
 				currentTheme={theme}
+				extensions={extensions}
+				onToggleExtension={handleToggleExtension}
+				onExecuteFile={handleExecuteFile}
+				openFiles={openFiles} // Pass openFiles to SettingsPopup
 			/>
 		</div>
 	);

@@ -21,7 +21,7 @@ export default function CodeEditor({
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 
 	const handleEditorChange = (value: string | undefined) => {
-		if (value) {
+		if (value !== undefined) {
 			onChange(value);
 		}
 	};
@@ -36,13 +36,16 @@ export default function CodeEditor({
 	return (
 		<div
 			ref={editorContainerRef}
-			className="flex-1"
-			style={{ paddingBottom: "10px" }}
+			className="flex-1 pb-2" // Using Tailwind CSS for padding and flex properties
 		>
 			<Editor
 				height="100%"
 				language={language}
-				value={content}
+				value={
+					typeof content === "object"
+						? JSON.stringify(content, null, "\t")
+						: content
+				}
 				theme={theme}
 				onChange={handleEditorChange}
 				options={{

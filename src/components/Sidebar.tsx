@@ -10,10 +10,11 @@ import {
 	FaHtml5,
 	FaCss3Alt,
 	FaJsSquare,
+	FaStore, // <-- Import the new icon for the marketplace
 } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
-import ImportButton from "@/components/ImportButton"; // Import the ImportButton component
+import ImportButton from "@/components/ImportButton";
 
 interface SidebarProps {
 	onToggleFiles: () => void;
@@ -28,7 +29,8 @@ interface SidebarProps {
 	onExport: () => void;
 	onRun: () => void;
 	onOpenSettings: () => void;
-	theme: string; // Pass theme to conditionally apply styles
+	onOpenMarketplace: () => void; // <-- New prop for opening the marketplace
+	theme: string;
 }
 
 export default function Sidebar({
@@ -38,6 +40,7 @@ export default function Sidebar({
 	onExport,
 	onRun,
 	onOpenSettings,
+	onOpenMarketplace, // <-- Add the new prop here
 	theme,
 }: SidebarProps) {
 	const handleAddFile = (type: "html" | "css" | "javascript") => {
@@ -57,6 +60,23 @@ export default function Sidebar({
 					: "bg-code-gray-200 text-black"
 			}`}
 		>
+			{/* Existing buttons */}
+			<button
+				type="button"
+				data-tooltip-id="tooltip-marketplace"
+				onClick={onOpenMarketplace} // <-- Hook up the new marketplace button
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
+			>
+				<FaStore size={36} />
+			</button>
+			<Tooltip id="tooltip-marketplace" place="right">
+				Marketplace
+			</Tooltip>
+			{/* Other existing buttons */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-files"
