@@ -22,6 +22,8 @@ export default function Home() {
 	const [isMarketplaceOpen, setIsMarketplaceOpen] = useState(false);
 	const [extensions, setExtensions] = useState([]);
 	const [theme, setTheme] = useState("vs-dark");
+	const [tabSize, setTabSize] = useState(4); // Default tab size
+	const [useTabs, setUseTabs] = useState(false); // Default to spaces
 	const router = useRouter();
 
 	useEffect(() => {
@@ -164,6 +166,8 @@ export default function Home() {
 					setFiles,
 					activeFile,
 					setActiveFile,
+					tabSize,
+					useTabs,
 				});
 			}
 		} catch (error) {
@@ -189,6 +193,8 @@ export default function Home() {
 									setFiles,
 									activeFile,
 									setActiveFile,
+									tabSize,
+									useTabs,
 								});
 							}
 						} catch (error) {
@@ -233,7 +239,7 @@ export default function Home() {
 				{isMarketplaceOpen && (
 					<Marketplace
 						onInstallExtension={handleInstallExtension}
-						installedExtensions={extensions} // Pass installed extensions
+						installedExtensions={extensions}
 						theme={theme}
 					/>
 				)}
@@ -259,6 +265,8 @@ export default function Home() {
 							language={openFiles[activeFile].type}
 							content={openFiles[activeFile].content}
 							theme={theme}
+							tabSize={tabSize}
+							useTabs={useTabs}
 							onChange={(content) =>
 								handleFileChange(
 									files.findIndex(
@@ -281,7 +289,11 @@ export default function Home() {
 				extensions={extensions}
 				onToggleExtension={handleToggleExtension}
 				onExecuteFile={handleExecuteFile}
-				openFiles={openFiles} // Pass openFiles to SettingsPopup
+				openFiles={openFiles}
+				tabSize={tabSize}
+				useTabs={useTabs}
+				onTabSizeChange={setTabSize}
+				onUseTabsChange={setUseTabs}
 			/>
 		</div>
 	);

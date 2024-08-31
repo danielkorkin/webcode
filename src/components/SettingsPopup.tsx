@@ -8,7 +8,11 @@ interface SettingsPopupProps {
 	extensions: any[];
 	onToggleExtension: (title: string) => void;
 	onExecuteFile: (extensionTitle: string, file: string) => void;
-	openFiles: any[]; // <-- Pass the list of open files
+	openFiles: any[];
+	tabSize: number;
+	useTabs: boolean;
+	onTabSizeChange: (size: number) => void;
+	onUseTabsChange: (useTabs: boolean) => void;
 }
 
 export default function SettingsPopup({
@@ -19,7 +23,11 @@ export default function SettingsPopup({
 	extensions,
 	onToggleExtension,
 	onExecuteFile,
-	openFiles, // <-- Receive open files as a prop
+	openFiles,
+	tabSize,
+	useTabs,
+	onTabSizeChange,
+	onUseTabsChange,
 }: SettingsPopupProps) {
 	if (!isOpen) return null;
 
@@ -120,6 +128,30 @@ export default function SettingsPopup({
 						<option value="vs-dark">VS Dark</option>
 						<option value="vs">VS Light</option>
 					</select>
+				</div>
+				<div className="mb-4">
+					<label className="block text-sm font-medium mb-2">
+						Tab Size
+					</label>
+					<input
+						type="number"
+						value={tabSize}
+						onChange={(e) =>
+							onTabSizeChange(Number(e.target.value))
+						}
+						className={`mt-1 block w-full p-2 rounded-md shadow-sm ${selectClasses}`}
+					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-sm font-medium mb-2">
+						Use Tabs
+					</label>
+					<input
+						type="checkbox"
+						checked={useTabs}
+						onChange={(e) => onUseTabsChange(e.target.checked)}
+						className="form-checkbox h-5 w-5 text-blue-600"
+					/>
 				</div>
 				<div className="mb-4">
 					<h3 className="text-lg font-bold">Extensions</h3>
