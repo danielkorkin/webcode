@@ -1,3 +1,5 @@
+import { FaHtml5, FaCss3Alt, FaJsSquare, FaRegFileAlt } from "react-icons/fa";
+
 interface FileTabsProps {
 	openFiles: {
 		name: string;
@@ -7,7 +9,7 @@ interface FileTabsProps {
 	activeFile: number | null;
 	onSelectFile: (index: number) => void;
 	onCloseFile: (index: number) => void;
-	theme: string; // Add theme prop
+	theme: string;
 }
 
 export default function FileTabs({
@@ -15,8 +17,21 @@ export default function FileTabs({
 	activeFile,
 	onSelectFile,
 	onCloseFile,
-	theme, // Receive theme prop
+	theme,
 }: FileTabsProps) {
+	const getFileIcon = (type: string) => {
+		switch (type) {
+			case "html":
+				return <FaHtml5 className="mr-2" />;
+			case "css":
+				return <FaCss3Alt className="mr-2" />;
+			case "javascript":
+				return <FaJsSquare className="mr-2" />;
+			default:
+				return <FaRegFileAlt className="mr-2" />;
+		}
+	};
+
 	return (
 		<div className="mb-4 flex border-b border-gray-300">
 			{openFiles.map(
@@ -27,7 +42,7 @@ export default function FileTabs({
 							className={`p-2 mr-2 rounded-t-md flex items-center ${
 								activeFile === index
 									? theme === "vs-dark"
-										? "bg-gray-800 text-white"
+										? "bg-code-grack text-white"
 										: "bg-gray-200 text-black"
 									: theme === "vs-dark"
 									? "bg-gray-700 text-white"
@@ -36,14 +51,15 @@ export default function FileTabs({
 						>
 							<button
 								type="button"
-								className="mr-2"
+								className="flex items-center"
 								onClick={() => onSelectFile(index)}
 							>
+								{getFileIcon(file.type)}
 								{file.name}
 							</button>
 							<button
 								type="button"
-								className="text-sm text-red-500"
+								className="ml-2 text-sm text-red-500"
 								onClick={() => onCloseFile(index)}
 							>
 								X

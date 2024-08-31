@@ -7,14 +7,24 @@ import {
 	FaFileDownload,
 	FaPlay,
 	FaCog, // New icon for settings
+	FaHtml5,
+	FaCss3Alt,
+	FaJsSquare
 } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+import ImportButton from "@/components/ImportButton"; // Import the ImportButton component
 
 interface SidebarProps {
 	onToggleFiles: () => void;
 	onAddFile: (name: string, type: "html" | "css" | "javascript") => void;
-	onImport: () => void;
+	onImport: (
+		files: {
+			name: string;
+			content: string;
+			type: "html" | "css" | "javascript";
+		}[]
+	) => void;
 	onExport: () => void;
 	onRun: () => void;
 	onOpenSettings: () => void; // Add function to open settings
@@ -43,7 +53,7 @@ export default function Sidebar({
 		<div
 			className={`flex flex-col items-center space-y-4 p-4 h-screen ${
 				theme === "vs-dark"
-					? "bg-gray-900 text-white"
+					? "bg-code-black text-white"
 					: "bg-white text-black"
 			}`}
 		>
@@ -65,7 +75,7 @@ export default function Sidebar({
 				onClick={() => handleAddFile("html")}
 				className="hover:bg-gray-700 p-2 rounded-md"
 			>
-				<FaFileCode size={36} />
+				<FaHtml5 size={36} />
 			</button>
 			<Tooltip id="tooltip-add-html" place="right">
 				Add HTML File
@@ -77,7 +87,7 @@ export default function Sidebar({
 				onClick={() => handleAddFile("css")}
 				className="hover:bg-gray-700 p-2 rounded-md"
 			>
-				<FaFileAlt size={36} />
+				<FaCss3Alt size={36} />
 			</button>
 			<Tooltip id="tooltip-add-css" place="right">
 				Add CSS File
@@ -89,23 +99,14 @@ export default function Sidebar({
 				onClick={() => handleAddFile("javascript")}
 				className="hover:bg-gray-700 p-2 rounded-md"
 			>
-				<FaFileAlt size={36} />
+				<FaJsSquare size={36} />
 			</button>
 			<Tooltip id="tooltip-add-js" place="right">
 				Add JS File
 			</Tooltip>
 
-			<button
-				type="button"
-				data-tooltip-id="tooltip-import"
-				onClick={onImport}
-				className="hover:bg-gray-700 p-2 rounded-md"
-			>
-				<FaFileUpload size={36} />
-			</button>
-			<Tooltip id="tooltip-import" place="right">
-				Import Project
-			</Tooltip>
+			{/* Use the ImportButton component for the Import functionality */}
+			<ImportButton onImport={onImport} />
 
 			<button
 				type="button"

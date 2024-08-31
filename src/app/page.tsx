@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import dynamic from "next/dynamic";
 import Sidebar from "@/components/Sidebar";
 import FileList from "@/components/FileList";
 import FileTabs from "@/components/FileTabs";
-import CodeEditor from "@/components/CodeEditor";
 import SettingsPopup from "@/components/SettingsPopup";
-import * as monaco from "monaco-editor";
+import CodeEditor from "@/components/CodeEditor";
+
+// Dynamically import the monaco-editor to prevent SSR issues
+const MonacoEditor = dynamic(() => import("monaco-editor"), { ssr: false });
 
 export default function Home() {
 	const [files, setFiles] = useState<
@@ -23,11 +26,38 @@ export default function Home() {
 	const [theme, setTheme] = useState("vs-dark"); // Default theme is dark
 	const router = useRouter();
 
+	// Load theme from localStorage on client side and set monaco-editor theme
 	useEffect(() => {
-		if (typeof window !== "undefined") {
-			// Set the theme in monaco editor
-			monaco.editor.setTheme(theme);
-		}
+		let isMounted = true;
+		const loadMonaco = async () => {
+			if (typeof window !== "undefined" && isMounted) {
+				const storedTheme = localStorage.getItem("theme") || "vs-dark";
+				setTheme(storedTheme);
+				const monaco = await import("monaco-editor");
+				if (monaco && monaco.editor) {
+					monaco.editor.setTheme(storedTheme as "vs" | "vs-dark");
+				}
+			}
+		};
+		loadMonaco();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	// Save theme to localStorage whenever it changes and update monaco editor theme
+	useEffect(() => {
+		const updateTheme = async () => {
+			if (typeof window !== "undefined") {
+				localStorage.setItem("theme", theme);
+				const monaco = await import("monaco-editor");
+				if (monaco && monaco.editor) {
+					monaco.editor.setTheme(theme as "vs" | "vs-dark");
+				}
+			}
+		};
+		updateTheme();
 	}, [theme]);
 
 	const handleAddFile = (
@@ -116,30 +146,39 @@ export default function Home() {
 		}
 	};
 
-	const handleThemeChange = (theme: string) => {
-		setTheme(theme);
+	const handleThemeChange = (newTheme: string) => {
+		setTheme(newTheme);
 	};
 
 	return (
 		<div
-			className={`flex ${
+			className={`flex h-screen ${
 				theme === "vs-dark"
-					? "bg-gray-900 text-white"
+					? "bg-code-gray text-white"
 					: "bg-white text-black"
 			}`}
 		>
-			<Sidebar
-				onToggleFiles={handleToggleFiles}
-				onAddFile={handleAddFile}
-				onImport={handleImport}
-				onExport={handleExport}
-				onRun={handleRun}
-				onOpenSettings={() => setIsSettingsOpen(true)} // Open settings
-				theme={theme} // Pass theme to sidebar for dynamic styling
-			/>
+			<div className="flex">
+				<Sidebar
+					onToggleFiles={handleToggleFiles}
+					onAddFile={handleAddFile}
+					onImport={handleImport}
+					onExport={handleExport}
+					onRun={handleRun}
+					onOpenSettings={() => setIsSettingsOpen(true)} // Open settings
+					theme={theme} // Pass theme to sidebar for dynamic styling
+				/>
+				{isFileListOpen && (
+					<FileList
+						files={files}
+						onOpenFile={handleOpenFile}
+						theme={theme} // Pass theme to file list
+					/>
+				)}
+			</div>
 			<div
-				className={`flex-1 p-4 transition-all duration-300 ${
-					isFileListOpen ? "ml-64" : "ml-0"
+				className={`flex-1 flex flex-col p-4 transition-all duration-300 ${
+					isFileListOpen ? "ml-[68px]" : "ml-[16px]"
 				}`}
 			>
 				<FileTabs
@@ -149,35 +188,29 @@ export default function Home() {
 					onCloseFile={handleCloseFile}
 					theme={theme} // Pass theme to file tabs
 				/>
-				{activeFile !== null && openFiles[activeFile] && (
-					<CodeEditor
-						language={openFiles[activeFile].type}
-						content={openFiles[activeFile].content}
-						theme={theme} // Pass theme to the editor
-						onChange={(content) =>
-							handleFileChange(
-								files.findIndex(
-									(f) => f.name === openFiles[activeFile].name
-								),
-								content
-							)
-						}
-					/>
-				)}
-			</div>
-			{isFileListOpen && (
 				<div
-					className={`fixed left-16 top-0 h-full w-64 shadow-lg z-10 ${
-						theme === "vs-dark" ? "bg-gray-800" : "bg-gray-100"
-					}`}
+					className="flex-1 overflow-auto"
+					style={{ paddingBottom: "10px" }}
 				>
-					<FileList
-						files={files}
-						onOpenFile={handleOpenFile}
-						theme={theme} // Pass theme to file list
-					/>
+					{activeFile !== null && openFiles[activeFile] && (
+						<CodeEditor
+							language={openFiles[activeFile].type}
+							content={openFiles[activeFile].content}
+							theme={theme} // Pass theme to the editor
+							onChange={(content) =>
+								handleFileChange(
+									files.findIndex(
+										(f) =>
+											f.name ===
+											openFiles[activeFile].name
+									),
+									content
+								)
+							}
+						/>
+					)}
 				</div>
-			)}
+			</div>
 			<SettingsPopup
 				isOpen={isSettingsOpen}
 				onClose={() => setIsSettingsOpen(false)}

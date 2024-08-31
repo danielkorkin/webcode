@@ -2,19 +2,29 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 
 interface ThemeContextProps {
-	theme: "light" | "dark";
-	setTheme: (theme: "light" | "dark") => void;
+	theme: "vs" | "vs-dark";
+	setTheme: (theme: "vs" | "vs-dark") => void;
 }
 
 export const ThemeContext = createContext<ThemeContextProps>({
-	theme: "light",
+	theme: "vs-dark",
 	setTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-	const [theme, setTheme] = useState<"light" | "dark">("light");
+	const [theme, setTheme] = useState<"vs" | "vs-dark">(() => {
+		// Initialize theme from localStorage if it exists
+		if (typeof window !== "undefined") {
+			return (
+				(localStorage.getItem("theme") as "vs" | "vs-dark") || "vs-dark"
+			);
+		}
+		return "vs-dark"; // Default theme
+	});
 
 	useEffect(() => {
+		// Save theme to localStorage whenever it changes
+		localStorage.setItem("theme", theme);
 		document.documentElement.className = theme;
 	}, [theme]);
 

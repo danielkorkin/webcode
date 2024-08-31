@@ -1,3 +1,4 @@
+// tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -9,18 +10,14 @@ const config: Config = {
 	darkMode: "class",
 	theme: {
 		extend: {
-			extend: {
-				colors: {
-					"vs-bg": "#FFFFFE", // Light theme background
-					"vs-dark-bg": "#1E1E1E", // Dark theme background
-					"vs-text": "#000000", // Light theme text
-					"vs-dark-text": "#D4D4D4", // Dark theme text
-				},
-			},
-			backgroundImage: {
-				"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-				"gradient-conic":
-					"conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+			colors: {
+				"vs-bg": "#FFFFFE", // Light theme background
+				"vs-dark-bg": "#1E1E1E", // Dark theme background
+				"vs-text": "#000000", // Light theme text
+				"vs-dark-text": "#D4D4D4", // Dark theme text
+				"code-gray": "#1E1E1E", // Your custom color for dark theme
+				"code-black": "#040404",
+				"code-grack": "#111111",
 			},
 		},
 	},

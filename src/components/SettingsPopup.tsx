@@ -1,4 +1,3 @@
-// src/components/SettingsPopup.tsx
 import React from "react";
 
 interface SettingsPopupProps {
@@ -16,20 +15,30 @@ export default function SettingsPopup({
 }: SettingsPopupProps) {
 	if (!isOpen) return null;
 
+	// Dynamically set classes based on the theme
+	const containerClasses =
+		currentTheme === "vs-dark"
+			? "bg-code-grack text-white"
+			: "bg-white text-black";
+	const selectClasses =
+		currentTheme === "vs-dark"
+			? "bg-gray-700 text-white border-gray-600"
+			: "bg-gray-100 text-black border-gray-300";
+
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-			<div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96">
-				<h2 className="text-xl font-bold mb-4 dark:text-white">
-					Settings
-				</h2>
+		<div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
+			<div
+				className={`p-8 rounded-lg w-96 backdrop-blur-lg shadow-lg ${containerClasses}`}
+			>
+				<h2 className="text-xl font-bold mb-4">Settings</h2>
 				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+					<label className="block text-sm font-medium mb-2">
 						Theme
 					</label>
 					<select
 						value={currentTheme}
 						onChange={(e) => onThemeChange(e.target.value)}
-						className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
+						className={`mt-1 block w-full p-2 rounded-md shadow-sm ${selectClasses}`}
 					>
 						<option value="vs-dark">VS Dark</option>
 						<option value="vs">VS Light</option>

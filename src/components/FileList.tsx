@@ -1,4 +1,4 @@
-import { FaRegFileAlt } from "react-icons/fa";
+import { FaHtml5, FaCss3Alt, FaJsSquare, FaRegFileAlt } from "react-icons/fa";
 
 interface FileListProps {
 	files: {
@@ -7,10 +7,23 @@ interface FileListProps {
 		type: "html" | "css" | "javascript";
 	}[];
 	onOpenFile: (index: number) => void;
-	theme: string; // Add theme prop
+	theme: string;
 }
 
 export default function FileList({ files, onOpenFile, theme }: FileListProps) {
+	const getFileIcon = (type: string) => {
+		switch (type) {
+			case "html":
+				return <FaHtml5 className="mr-2" />;
+			case "css":
+				return <FaCss3Alt className="mr-2" />;
+			case "javascript":
+				return <FaJsSquare className="mr-2" />;
+			default:
+				return <FaRegFileAlt className="mr-2" />;
+		}
+	};
+
 	// Ensure files is an array
 	if (!Array.isArray(files)) {
 		return <div>No files available.</div>;
@@ -18,9 +31,9 @@ export default function FileList({ files, onOpenFile, theme }: FileListProps) {
 
 	return (
 		<div
-			className={`absolute left-0 top-10 w-64 h-screen p-4 shadow-lg ${
+			className={`w-64 h-screen p-4 shadow-lg ${
 				theme === "vs-dark"
-					? "bg-gray-800 text-white"
+					? "bg-code-grack text-white"
 					: "bg-white text-black"
 			}`}
 		>
@@ -29,13 +42,14 @@ export default function FileList({ files, onOpenFile, theme }: FileListProps) {
 				{files.map((file, index) => (
 					<li
 						key={file.name}
-						className={`cursor-pointer mb-2 p-2 rounded-md ${
+						className={`cursor-pointer mb-2 p-2 rounded-md flex items-center ${
 							theme === "vs-dark"
 								? "hover:bg-gray-700"
 								: "hover:bg-gray-200"
 						}`}
 						onClick={() => onOpenFile(index)}
 					>
+						{getFileIcon(file.type)}
 						{file.name}
 					</li>
 				))}

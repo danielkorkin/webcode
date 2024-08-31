@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { FaFileUpload } from "react-icons/fa";
 
 interface ImportButtonProps {
 	onImport: (
@@ -27,17 +28,19 @@ export default function ImportButton({ onImport }: ImportButtonProps) {
 	};
 
 	const handleClick = () => {
-		fileInputRef.current?.click();
+		if (fileInputRef.current) {
+			fileInputRef.current.click();
+		}
 	};
 
 	return (
 		<>
 			<button
 				type="button"
-				className="p-2 bg-orange-500 text-white rounded-md"
+				className="hover:bg-gray-700 p-2 rounded-md"
 				onClick={handleClick}
 			>
-				Import Project
+				<FaFileUpload size={36} />
 			</button>
 			<input
 				type="file"
