@@ -178,6 +178,40 @@ export default function Home() {
 		}
 	};
 
+	const handleImportSettings = () => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = ".json";
+		input.onchange = async (event: any) => {
+			const file = event.target.files[0];
+			const text = await file.text();
+			const settings = JSON.parse(text);
+			if (settings.theme) setTheme(settings.theme);
+			if (settings.extensions) setExtensions(settings.extensions);
+			if (settings.tabSize) setTabSize(settings.tabSize);
+			if (settings.useTabs !== undefined) setUseTabs(settings.useTabs);
+		};
+		input.click();
+	};
+
+	const handleExportSettings = () => {
+		const settings = {
+			theme,
+			extensions,
+			tabSize,
+			useTabs,
+		};
+		const dataStr =
+			"data:text/json;charset=utf-8," +
+			encodeURIComponent(JSON.stringify(settings, null, 2));
+		const downloadAnchorNode = document.createElement("a");
+		downloadAnchorNode.setAttribute("href", dataStr);
+		downloadAnchorNode.setAttribute("download", "settings.json");
+		document.body.appendChild(downloadAnchorNode);
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
+	};
+
 	useEffect(() => {
 		const loadEnabledExtensions = async () => {
 			for (const extension of extensions) {
@@ -227,6 +261,8 @@ export default function Home() {
 					onRun={handleRun}
 					onOpenSettings={() => setIsSettingsOpen(true)}
 					onOpenMarketplace={handleToggleMarketplace}
+					onImportSettings={handleImportSettings} // <-- Pass the new handler
+					onExportSettings={handleExportSettings} // <-- Pass the new handler
 					theme={theme}
 				/>
 				{isFileListOpen && (

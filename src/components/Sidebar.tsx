@@ -1,4 +1,3 @@
-// src/components/Sidebar.tsx
 import {
 	FaRegFileAlt,
 	FaFileCode,
@@ -11,6 +10,8 @@ import {
 	FaCss3Alt,
 	FaJsSquare,
 	FaStore, // <-- Import the new icon for the marketplace
+	FaDownload,
+	FaUpload,
 } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
@@ -24,12 +25,14 @@ interface SidebarProps {
 			name: string;
 			content: string;
 			type: "html" | "css" | "javascript";
-		}[]
+		}[],
 	) => void;
 	onExport: () => void;
 	onRun: () => void;
 	onOpenSettings: () => void;
 	onOpenMarketplace: () => void; // <-- New prop for opening the marketplace
+	onImportSettings: () => void; // <-- New prop for importing settings
+	onExportSettings: () => void; // <-- New prop for exporting settings
 	theme: string;
 }
 
@@ -41,11 +44,13 @@ export default function Sidebar({
 	onRun,
 	onOpenSettings,
 	onOpenMarketplace, // <-- Add the new prop here
+	onImportSettings, // <-- Add the new prop here
+	onExportSettings, // <-- Add the new prop here
 	theme,
 }: SidebarProps) {
 	const handleAddFile = (type: "html" | "css" | "javascript") => {
 		const name = prompt(
-			`Enter the name for the new ${type.toUpperCase()} file:`
+			`Enter the name for the new ${type.toUpperCase()} file:`,
 		);
 		if (name) {
 			onAddFile(name, type);
@@ -76,6 +81,39 @@ export default function Sidebar({
 			<Tooltip id="tooltip-marketplace" place="right">
 				Marketplace
 			</Tooltip>
+
+			<button
+				type="button"
+				data-tooltip-id="tooltip-import-settings"
+				onClick={onImportSettings} // <-- Hook up the new import settings button
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
+			>
+				<FaUpload size={36} />
+			</button>
+			<Tooltip id="tooltip-import-settings" place="right">
+				Import Settings
+			</Tooltip>
+
+			<button
+				type="button"
+				data-tooltip-id="tooltip-export-settings"
+				onClick={onExportSettings} // <-- Hook up the new export settings button
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
+			>
+				<FaDownload size={36} />
+			</button>
+			<Tooltip id="tooltip-export-settings" place="right">
+				Export Settings
+			</Tooltip>
+
 			{/* Other existing buttons */}
 			<button
 				type="button"
