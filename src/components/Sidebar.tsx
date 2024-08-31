@@ -6,10 +6,10 @@ import {
 	FaFileUpload,
 	FaFileDownload,
 	FaPlay,
-	FaCog, // New icon for settings
+	FaCog,
 	FaHtml5,
 	FaCss3Alt,
-	FaJsSquare
+	FaJsSquare,
 } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
@@ -27,7 +27,7 @@ interface SidebarProps {
 	) => void;
 	onExport: () => void;
 	onRun: () => void;
-	onOpenSettings: () => void; // Add function to open settings
+	onOpenSettings: () => void;
 	theme: string; // Pass theme to conditionally apply styles
 }
 
@@ -37,7 +37,7 @@ export default function Sidebar({
 	onImport,
 	onExport,
 	onRun,
-	onOpenSettings, // Function to open settings
+	onOpenSettings,
 	theme,
 }: SidebarProps) {
 	const handleAddFile = (type: "html" | "css" | "javascript") => {
@@ -54,14 +54,18 @@ export default function Sidebar({
 			className={`flex flex-col items-center space-y-4 p-4 h-screen ${
 				theme === "vs-dark"
 					? "bg-code-black text-white"
-					: "bg-white text-black"
+					: "bg-code-gray-200 text-black"
 			}`}
 		>
 			<button
 				type="button"
 				data-tooltip-id="tooltip-files"
 				onClick={onToggleFiles}
-				className="hover:bg-gray-700 p-2 rounded-md"
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 			>
 				<FaRegFileAlt size={36} />
 			</button>
@@ -73,7 +77,11 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-add-html"
 				onClick={() => handleAddFile("html")}
-				className="hover:bg-gray-700 p-2 rounded-md"
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 			>
 				<FaHtml5 size={36} />
 			</button>
@@ -85,7 +93,11 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-add-css"
 				onClick={() => handleAddFile("css")}
-				className="hover:bg-gray-700 p-2 rounded-md"
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 			>
 				<FaCss3Alt size={36} />
 			</button>
@@ -97,7 +109,11 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-add-js"
 				onClick={() => handleAddFile("javascript")}
-				className="hover:bg-gray-700 p-2 rounded-md"
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 			>
 				<FaJsSquare size={36} />
 			</button>
@@ -106,13 +122,17 @@ export default function Sidebar({
 			</Tooltip>
 
 			{/* Use the ImportButton component for the Import functionality */}
-			<ImportButton onImport={onImport} />
+			<ImportButton onImport={onImport} theme={theme} />
 
 			<button
 				type="button"
 				data-tooltip-id="tooltip-export"
 				onClick={onExport}
-				className="hover:bg-gray-700 p-2 rounded-md"
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 			>
 				<FaFileDownload size={36} />
 			</button>
@@ -124,7 +144,11 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-run"
 				onClick={onRun}
-				className="hover:bg-gray-700 p-2 rounded-md mt-auto"
+				className={`p-2 rounded-md mt-auto ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 			>
 				<FaPlay size={36} />
 			</button>
@@ -137,7 +161,11 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-settings"
 				onClick={onOpenSettings}
-				className="hover:bg-gray-700 p-2 rounded-md"
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 			>
 				<FaCog size={36} />
 			</button>

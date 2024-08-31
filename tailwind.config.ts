@@ -18,6 +18,8 @@ const config: Config = {
 				"code-gray": "#1E1E1E", // Your custom color for dark theme
 				"code-black": "#040404",
 				"code-grack": "#111111",
+				"code-gray-200": "#cccccb",
+				"code-gray-100": "#e5e5e4",
 			},
 		},
 	},

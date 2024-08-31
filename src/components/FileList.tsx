@@ -34,7 +34,7 @@ export default function FileList({ files, onOpenFile, theme }: FileListProps) {
 			className={`w-64 h-screen p-4 shadow-lg ${
 				theme === "vs-dark"
 					? "bg-code-grack text-white"
-					: "bg-white text-black"
+					: "bg-code-gray-100 text-black"
 			}`}
 		>
 			<h3 className="text-lg font-bold mb-4">Files</h3>

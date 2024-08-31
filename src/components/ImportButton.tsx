@@ -9,9 +9,10 @@ interface ImportButtonProps {
 			type: "html" | "css" | "javascript";
 		}[]
 	) => void;
+	theme: string; // Add theme prop to control the styles
 }
 
-export default function ImportButton({ onImport }: ImportButtonProps) {
+export default function ImportButton({ onImport, theme }: ImportButtonProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +38,11 @@ export default function ImportButton({ onImport }: ImportButtonProps) {
 		<>
 			<button
 				type="button"
-				className="hover:bg-gray-700 p-2 rounded-md"
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
 				onClick={handleClick}
 			>
 				<FaFileUpload size={36} />
