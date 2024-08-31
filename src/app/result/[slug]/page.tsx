@@ -18,19 +18,35 @@ export default function ResultPage() {
 
 	const renderHTML = () => {
 		const htmlFile = files.find((file) => file.type === "html");
-		const cssFiles = files.filter((file) => file.type === "css");
-		const jsFiles = files.filter((file) => file.type === "javascript");
-
 		if (!htmlFile) return "No HTML file found.";
+
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(htmlFile.content, "text/html");
+
+		// Find all linked stylesheets
+		const linkedStylesheets: string[] = [];
+		doc.querySelectorAll('link[rel="stylesheet"]').forEach(
+			(linkElement) => {
+				const href = linkElement.getAttribute("href");
+				if (href) {
+					linkedStylesheets.push(href);
+				}
+			}
+		);
+
+		const cssContent = files
+			.filter(
+				(file) =>
+					file.type === "css" && linkedStylesheets.includes(file.name)
+			)
+			.map((file) => file.content)
+			.join("\n");
+
+		const jsFiles = files.filter((file) => file.type === "javascript");
 
 		return (
 			<>
-				{cssFiles.map((file) => (
-					<style
-						key={file.name}
-						dangerouslySetInnerHTML={{ __html: file.content }}
-					/>
-				))}
+				<style>{cssContent}</style>
 				<div dangerouslySetInnerHTML={{ __html: htmlFile.content }} />
 				{jsFiles.map((file) => (
 					<script
