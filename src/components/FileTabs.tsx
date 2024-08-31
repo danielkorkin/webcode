@@ -7,6 +7,7 @@ interface FileTabsProps {
 	activeFile: number | null;
 	onSelectFile: (index: number) => void;
 	onCloseFile: (index: number) => void;
+	theme: string; // Add theme prop
 }
 
 export default function FileTabs({
@@ -14,6 +15,7 @@ export default function FileTabs({
 	activeFile,
 	onSelectFile,
 	onCloseFile,
+	theme, // Receive theme prop
 }: FileTabsProps) {
 	return (
 		<div className="mb-4 flex border-b border-gray-300">
@@ -24,8 +26,12 @@ export default function FileTabs({
 							key={file.name}
 							className={`p-2 mr-2 rounded-t-md flex items-center ${
 								activeFile === index
-									? "bg-gray-800 text-white"
-									: "bg-gray-200"
+									? theme === "vs-dark"
+										? "bg-gray-800 text-white"
+										: "bg-gray-200 text-black"
+									: theme === "vs-dark"
+									? "bg-gray-700 text-white"
+									: "bg-gray-100 text-black"
 							}`}
 						>
 							<button

@@ -7,12 +7,14 @@ const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 interface EditorProps {
 	language: "html" | "css" | "javascript";
 	content: string;
+	theme: string; // Add theme prop
 	onChange: (value: string) => void;
 }
 
 export default function CodeEditor({
 	language,
 	content,
+	theme, // Receive theme prop
 	onChange,
 }: EditorProps) {
 	const handleEditorChange = (value: string | undefined) => {
@@ -27,7 +29,7 @@ export default function CodeEditor({
 				height="400px"
 				language={language}
 				value={content}
-				theme="vs-dark"
+				theme={theme} // Use theme prop
 				onChange={handleEditorChange}
 			/>
 		</div>
