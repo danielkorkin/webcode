@@ -2,8 +2,8 @@ import "./globals.css";
 import { ReactNode } from "react";
 
 export const metadata = {
-	title: "Web VS Code",
-	description: "A web-based VS Code-like environment",
+	title: "WebCode",
+	description: "A web-based for web development (with html, css, and js) code editor",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
