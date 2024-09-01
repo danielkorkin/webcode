@@ -1,7 +1,7 @@
 [
 	{
 		"title": "Prettier Formatter",
-        "value":"prettier",
+		"value": "prettier",
 		"description": "Formats your code using Prettier.",
 		"icon": "/icons/prettier.png",
 		"files": ["formatFile.tsx", "formatAllFiles.tsx"],
@@ -17,6 +17,22 @@
 				"label": "Format Selected File",
 				"options": [],
 				"onChangeFile": "formatFile.tsx"
+			}
+		],
+		"fileActions": []
+	},
+	{
+		"title": "Snippets and Templates",
+		"value": "snippets",
+		"description": "Provides a collection of code snippets and project templates.",
+		"icon": "/icons/snippets.png",
+		"files": ["SnippetsPage.tsx"],
+		"enabled": true,
+		"uiComponents": [
+			{
+				"type": "page",
+				"label": "Snippets and Templates",
+				"onOpenPage": "SnippetsPage.tsx"
 			}
 		],
 		"fileActions": []

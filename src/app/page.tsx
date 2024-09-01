@@ -11,7 +11,14 @@ import SettingsPopup from "@/components/SettingsPopup";
 import Marketplace from "@/components/Marketplace";
 import CodeEditor from "@/components/CodeEditor";
 
+// Load Monaco Editor dynamically
 const MonacoEditor = dynamic(() => import("monaco-editor"), { ssr: false });
+
+// Load SnippetsPage dynamically when needed
+const SnippetsPage = dynamic(
+	() => import("@/extensions/snippets/SnippetsPage"),
+	{ ssr: false },
+);
 
 export default function Home() {
 	const [files, setFiles] = useState([]);
@@ -22,36 +29,39 @@ export default function Home() {
 	const [isMarketplaceOpen, setIsMarketplaceOpen] = useState(false);
 	const [extensions, setExtensions] = useState([]);
 	const [theme, setTheme] = useState("vs-dark");
-	const [tabSize, setTabSize] = useState(4); // Default tab size
-	const [useTabs, setUseTabs] = useState(false); // Default to spaces
+	const [tabSize, setTabSize] = useState(4);
+	const [useTabs, setUseTabs] = useState(false);
+	const [currentExtensionUI, setCurrentExtensionUI] = useState<string | null>(
+		null,
+	);
+	const [key, setKey] = useState(0);
 	const router = useRouter();
 
+	// Function to trigger UI reload
+	const handleReloadUI = () => {
+		setKey((prevKey) => prevKey + 1);
+	};
+
 	useEffect(() => {
-		let isMounted = true;
+		// Load Monaco Editor theme
 		const loadMonaco = async () => {
-			if (typeof window !== "undefined" && isMounted) {
-				const storedTheme = localStorage.getItem("theme") || "vs-dark";
-				setTheme(storedTheme);
-				const monaco = await import("monaco-editor");
-				if (monaco && monaco.editor) {
-					monaco.editor.setTheme(storedTheme as "vs" | "vs-dark");
-				}
+			const storedTheme = localStorage.getItem("theme") || "vs-dark";
+			setTheme(storedTheme);
+			const monaco = await import("monaco-editor");
+			if (monaco?.editor) {
+				monaco.editor.setTheme(storedTheme as "vs" | "vs-dark");
 			}
 		};
 		loadMonaco();
-		return () => {
-			isMounted = false;
-		};
-	}, []);
+	}, [key]);
 
 	useEffect(() => {
+		// Update theme
 		const updateTheme = async () => {
-			if (typeof window !== "undefined") {
-				localStorage.setItem("theme", theme);
-				const monaco = await import("monaco-editor");
-				if (monaco && monaco.editor) {
-					monaco.editor.setTheme(theme as "vs" | "vs-dark");
-				}
+			localStorage.setItem("theme", theme);
+			const monaco = await import("monaco-editor");
+			if (monaco?.editor) {
+				monaco.editor.setTheme(theme as "vs" | "vs-dark");
 			}
 		};
 		updateTheme();
@@ -80,9 +90,7 @@ export default function Home() {
 	const handleDownloadFile = (index: number) => {
 		const file = files[index];
 		if (file) {
-			const dataStr =
-				"data:text/plain;charset=utf-8," +
-				encodeURIComponent(file.content);
+			const dataStr = `data:text/plain;charset=utf-8,${encodeURIComponent(file.content)}`;
 			const downloadAnchorNode = document.createElement("a");
 			downloadAnchorNode.setAttribute("href", dataStr);
 			downloadAnchorNode.setAttribute("download", file.name);
@@ -120,7 +128,6 @@ export default function Home() {
 		const alreadyOpen = openFiles.findIndex(
 			(file) => file.name === fileToOpen.name,
 		);
-
 		if (alreadyOpen === -1) {
 			setOpenFiles([...openFiles, fileToOpen]);
 			setActiveFile(openFiles.length);
@@ -152,11 +159,9 @@ export default function Home() {
 	};
 
 	const handleRun = () => {
-		if (typeof window !== "undefined") {
-			const slug = uuidv4();
-			localStorage.setItem(slug, JSON.stringify(files));
-			router.push(`/result/${slug}`);
-		}
+		const slug = uuidv4();
+		localStorage.setItem(slug, JSON.stringify(files));
+		router.push(`/result/${slug}`);
 	};
 
 	const handleImport = (importedFiles: any[]) => {
@@ -165,17 +170,15 @@ export default function Home() {
 	};
 
 	const handleExport = () => {
-		if (typeof window !== "undefined") {
-			const dataStr =
-				"data:text/json;charset=utf-8," +
-				encodeURIComponent(JSON.stringify(files, null, 2));
-			const downloadAnchorNode = document.createElement("a");
-			downloadAnchorNode.setAttribute("href", dataStr);
-			downloadAnchorNode.setAttribute("download", "project-files.json");
-			document.body.appendChild(downloadAnchorNode);
-			downloadAnchorNode.click();
-			downloadAnchorNode.remove();
-		}
+		const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
+			JSON.stringify(files, null, 2),
+		)}`;
+		const downloadAnchorNode = document.createElement("a");
+		downloadAnchorNode.setAttribute("href", dataStr);
+		downloadAnchorNode.setAttribute("download", "project-files.json");
+		document.body.appendChild(downloadAnchorNode);
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
 	};
 
 	const handleThemeChange = (newTheme: string) => {
@@ -208,7 +211,7 @@ export default function Home() {
 			const extModule = await import(
 				`@/extensions/${extensionValue}/${file}`
 			);
-			if (extModule && extModule.default) {
+			if (extModule?.default) {
 				extModule.default({
 					files,
 					setFiles,
@@ -249,9 +252,9 @@ export default function Home() {
 			tabSize,
 			useTabs,
 		};
-		const dataStr =
-			"data:text/json;charset=utf-8," +
-			encodeURIComponent(JSON.stringify(settings, null, 2));
+		const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
+			JSON.stringify(settings, null, 2),
+		)}`;
 		const downloadAnchorNode = document.createElement("a");
 		downloadAnchorNode.setAttribute("href", dataStr);
 		downloadAnchorNode.setAttribute("download", "settings.json");
@@ -283,6 +286,10 @@ export default function Home() {
 		setOpenFiles(updatedFiles);
 	};
 
+	const handleOpenExtensionUI = (uiFile: string) => {
+		setCurrentExtensionUI(uiFile);
+	};
+
 	useEffect(() => {
 		const loadEnabledExtensions = async () => {
 			for (const extension of extensions) {
@@ -292,7 +299,7 @@ export default function Home() {
 							const extModule = await import(
 								`@/extensions/${extension.value}/${file}`
 							);
-							if (extModule && extModule.default) {
+							if (extModule?.default) {
 								extModule.default({
 									files,
 									setFiles,
@@ -317,11 +324,8 @@ export default function Home() {
 
 	return (
 		<div
-			className={`flex h-screen ${
-				theme === "vs-dark"
-					? "bg-code-gray text-white"
-					: "bg-white text-black"
-			}`}
+			key={key} // Re-render trigger
+			className={`flex h-screen ${theme === "vs-dark" ? "bg-code-gray text-white" : "bg-white text-black"}`}
 		>
 			<div className="flex">
 				<Sidebar
@@ -335,6 +339,8 @@ export default function Home() {
 					onImportSettings={handleImportSettings}
 					onExportSettings={handleExportSettings}
 					theme={theme}
+					extensions={extensions}
+					onOpenExtensionUI={handleOpenExtensionUI}
 				/>
 				{isFileListOpen && (
 					<FileList
@@ -342,7 +348,7 @@ export default function Home() {
 						onOpenFile={handleOpenFile}
 						onRenameFile={handleRenameFile}
 						onDownloadFile={handleDownloadFile}
-						onDeleteFile={handleDeleteFile} // Pass delete handler
+						onDeleteFile={handleDeleteFile}
 						theme={theme}
 					/>
 				)}
@@ -355,9 +361,7 @@ export default function Home() {
 				)}
 			</div>
 			<div
-				className={`flex-1 flex flex-col p-4 transition-all duration-300 ${
-					isFileListOpen ? "ml-[68px]" : "ml-[16px]"
-				}`}
+				className={`flex-1 flex flex-col p-4 transition-all duration-300 ${isFileListOpen ? "ml-[68px]" : "ml-[16px]"}`}
 			>
 				<FileTabs
 					openFiles={openFiles}
@@ -365,7 +369,7 @@ export default function Home() {
 					onSelectFile={setActiveFile}
 					onCloseFile={handleCloseFile}
 					onDownloadFile={handleDownloadFile}
-					onDeleteFile={handleDeleteFile} // Pass delete handler
+					onDeleteFile={handleDeleteFile}
 					onCloseOthers={handleCloseOthers}
 					onCloseRight={handleCloseRight}
 					onReorderFiles={handleReorderFiles}
@@ -396,6 +400,7 @@ export default function Home() {
 					)}
 				</div>
 			</div>
+			{currentExtensionUI && <SnippetsPage />}
 			<SettingsPopup
 				isOpen={isSettingsOpen}
 				onClose={() => setIsSettingsOpen(false)}
@@ -409,8 +414,9 @@ export default function Home() {
 				useTabs={useTabs}
 				onTabSizeChange={setTabSize}
 				onUseTabsChange={setUseTabs}
-				onConvertTabsToSpaces={convertTabsToSpaces} // Pass conversion handler
-				onConvertSpacesToTabs={convertSpacesToTabs} // Pass conversion handler
+				onConvertTabsToSpaces={convertTabsToSpaces}
+				onConvertSpacesToTabs={convertSpacesToTabs}
+				onReloadUI={handleReloadUI} // Pass the reload function
 			/>
 		</div>
 	);

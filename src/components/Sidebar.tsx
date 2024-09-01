@@ -1,17 +1,14 @@
 import {
 	FaRegFileAlt,
-	FaFileCode,
-	FaFileAlt,
-	FaFileUpload,
-	FaFileDownload,
-	FaPlay,
-	FaCog,
 	FaHtml5,
 	FaCss3Alt,
 	FaJsSquare,
-	FaStore, // <-- Import the new icon for the marketplace
-	FaDownload,
+	FaStore,
 	FaUpload,
+	FaDownload,
+	FaPlay,
+	FaCog,
+	FaFileDownload,
 } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
@@ -30,10 +27,12 @@ interface SidebarProps {
 	onExport: () => void;
 	onRun: () => void;
 	onOpenSettings: () => void;
-	onOpenMarketplace: () => void; // <-- New prop for opening the marketplace
-	onImportSettings: () => void; // <-- New prop for importing settings
-	onExportSettings: () => void; // <-- New prop for exporting settings
+	onOpenMarketplace: () => void;
+	onImportSettings: () => void;
+	onExportSettings: () => void;
 	theme: string;
+	extensions: any[];
+	onOpenExtensionUI: (uiFile: string) => void;
 }
 
 export default function Sidebar({
@@ -43,10 +42,12 @@ export default function Sidebar({
 	onExport,
 	onRun,
 	onOpenSettings,
-	onOpenMarketplace, // <-- Add the new prop here
-	onImportSettings, // <-- Add the new prop here
-	onExportSettings, // <-- Add the new prop here
+	onOpenMarketplace,
+	onImportSettings,
+	onExportSettings,
 	theme,
+	extensions,
+	onOpenExtensionUI,
 }: SidebarProps) {
 	const handleAddFile = (type: "html" | "css" | "javascript") => {
 		const name = prompt(
@@ -69,11 +70,7 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-files"
 				onClick={onToggleFiles}
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaRegFileAlt size={36} />
 			</button>
@@ -85,11 +82,7 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-add-html"
 				onClick={() => handleAddFile("html")}
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaHtml5 size={36} />
 			</button>
@@ -101,11 +94,7 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-add-css"
 				onClick={() => handleAddFile("css")}
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaCss3Alt size={36} />
 			</button>
@@ -117,11 +106,7 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-add-js"
 				onClick={() => handleAddFile("javascript")}
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaJsSquare size={36} />
 			</button>
@@ -132,12 +117,8 @@ export default function Sidebar({
 			<button
 				type="button"
 				data-tooltip-id="tooltip-marketplace"
-				onClick={onOpenMarketplace} // <-- Hook up the new marketplace button
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				onClick={onOpenMarketplace}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaStore size={36} />
 			</button>
@@ -148,12 +129,8 @@ export default function Sidebar({
 			<button
 				type="button"
 				data-tooltip-id="tooltip-import-settings"
-				onClick={onImportSettings} // <-- Hook up the new import settings button
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				onClick={onImportSettings}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaUpload size={36} />
 			</button>
@@ -164,12 +141,8 @@ export default function Sidebar({
 			<button
 				type="button"
 				data-tooltip-id="tooltip-export-settings"
-				onClick={onExportSettings} // <-- Hook up the new export settings button
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				onClick={onExportSettings}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaDownload size={36} />
 			</button>
@@ -177,18 +150,13 @@ export default function Sidebar({
 				Export Settings
 			</Tooltip>
 
-			{/* Use the ImportButton component for the Import functionality */}
 			<ImportButton onImport={onImport} theme={theme} />
 
 			<button
 				type="button"
 				data-tooltip-id="tooltip-export"
 				onClick={onExport}
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaFileDownload size={36} />
 			</button>
@@ -200,11 +168,7 @@ export default function Sidebar({
 				type="button"
 				data-tooltip-id="tooltip-run"
 				onClick={onRun}
-				className={`p-2 rounded-md mt-auto ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				className={`p-2 rounded-md mt-auto ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaPlay size={36} />
 			</button>
@@ -212,22 +176,38 @@ export default function Sidebar({
 				Run Project
 			</Tooltip>
 
-			{/* Settings Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-settings"
 				onClick={onOpenSettings}
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
+				className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
 			>
 				<FaCog size={36} />
 			</button>
 			<Tooltip id="tooltip-settings" place="right">
 				Settings
 			</Tooltip>
+
+			{extensions.map((extension) => {
+				if (extension.uiFile) {
+					return (
+						<button
+							key={extension.value}
+							type="button"
+							data-tooltip-id={`tooltip-${extension.value}`}
+							onClick={() => onOpenExtensionUI(extension.uiFile)}
+							className={`p-2 rounded-md ${theme === "vs-dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
+						>
+							<img
+								src={extension.icon}
+								alt={extension.title}
+								className="h-8 w-8"
+							/>
+						</button>
+					);
+				}
+				return null;
+			})}
 		</div>
 	);
 }

@@ -1,0 +1,16 @@
+{
+	"title": "Snippets and Templates",
+	"description": "Provides code snippets and project templates.",
+	"icon": "/icons/snippets.png",
+	"files": ["SnippetsPage.tsx"],
+	"enabled": true,
+	"uiComponents": [
+		{
+			"type": "sidebar",
+			"tooltip": "Snippets & Templates",
+			"icon": "/icons/snippets.png",
+			"uiFile": "SnippetsPage.tsx"
+		}
+	],
+	"fileActions": []
+}

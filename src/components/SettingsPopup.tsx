@@ -13,8 +13,9 @@ interface SettingsPopupProps {
 	useTabs: boolean;
 	onTabSizeChange: (size: number) => void;
 	onUseTabsChange: (useTabs: boolean) => void;
-	onConvertTabsToSpaces: () => void; // New prop for converting tabs to spaces
-	onConvertSpacesToTabs: () => void; // New prop for converting spaces to tabs
+	onConvertTabsToSpaces: () => void;
+	onConvertSpacesToTabs: () => void;
+	onReloadUI: () => void; // New prop for reloading the UI
 }
 
 export default function SettingsPopup({
@@ -30,10 +31,54 @@ export default function SettingsPopup({
 	useTabs,
 	onTabSizeChange,
 	onUseTabsChange,
-	onConvertTabsToSpaces, // New prop
-	onConvertSpacesToTabs, // New prop
+	onConvertTabsToSpaces,
+	onConvertSpacesToTabs,
+	onReloadUI, // New prop for reloading the UI
 }: SettingsPopupProps) {
 	if (!isOpen) return null;
+
+	const renderUIComponents = (extension: any) => {
+		return extension.uiComponents.map((component: any, index: number) => {
+			if (component.type === "button") {
+				return (
+					<button
+						key={index}
+						className="bg-blue-500 text-white p-2 rounded-md mt-2"
+						onClick={() =>
+							onExecuteFile(
+								extension.value,
+								component.onClickFile,
+							)
+						}
+					>
+						{component.label}
+					</button>
+				);
+			} else if (component.type === "select") {
+				return (
+					<select
+						key={index}
+						className="bg-gray-200 text-black p-2 rounded-md mt-2"
+						onChange={(e) =>
+							onExecuteFile(
+								extension.value,
+								component.onChangeFile,
+							)
+						}
+					>
+						{component.options.map(
+							(option: string, idx: number) => (
+								<option key={idx} value={option}>
+									{option}
+								</option>
+							),
+						)}
+					</select>
+				);
+			}
+			return null;
+		});
+	};
 
 	const containerClasses =
 		currentTheme === "vs-dark"
@@ -131,6 +176,14 @@ export default function SettingsPopup({
 							</li>
 						))}
 					</ul>
+				</div>
+				<div className="mb-4">
+					<button
+						onClick={onReloadUI} // Reload UI button
+						className="w-full bg-yellow-500 text-white px-4 py-2 rounded-md"
+					>
+						Reload UI
+					</button>
 				</div>
 				<button
 					onClick={onClose}

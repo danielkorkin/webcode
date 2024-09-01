@@ -1,4 +1,3 @@
-// src/components/Marketplace.tsx
 import { useState, useEffect } from "react";
 import { FaDownload } from "react-icons/fa";
 
@@ -44,7 +43,7 @@ export default function Marketplace({
 			<ul>
 				{extensions.map((extension) => {
 					const isInstalled = installedExtensions.some(
-						(ext) => ext.title === extension.title
+						(ext) => ext.title === extension.title,
 					);
 					return (
 						<li
