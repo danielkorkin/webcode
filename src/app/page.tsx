@@ -63,6 +63,35 @@ export default function Home() {
 		handleOpenFile(files.length);
 	};
 
+	const handleRenameFile = (index: number, newName: string) => {
+		const updatedFiles = [...files];
+		updatedFiles[index].name = newName;
+		setFiles(updatedFiles);
+		const openIndex = openFiles.findIndex(
+			(file) => file.name === updatedFiles[index].name,
+		);
+		if (openIndex !== -1) {
+			const updatedOpenFiles = [...openFiles];
+			updatedOpenFiles[openIndex].name = newName;
+			setOpenFiles(updatedOpenFiles);
+		}
+	};
+
+	const handleDownloadFile = (index: number) => {
+		const file = files[index];
+		if (file) {
+			const dataStr =
+				"data:text/plain;charset=utf-8," +
+				encodeURIComponent(file.content);
+			const downloadAnchorNode = document.createElement("a");
+			downloadAnchorNode.setAttribute("href", dataStr);
+			downloadAnchorNode.setAttribute("download", file.name);
+			document.body.appendChild(downloadAnchorNode);
+			downloadAnchorNode.click();
+			downloadAnchorNode.remove();
+		}
+	};
+
 	const handleFileChange = (index: number, content: string) => {
 		const updatedFiles = [...files];
 		updatedFiles[index].content = content;
@@ -97,6 +126,18 @@ export default function Home() {
 		const updatedOpenFiles = openFiles.filter((_, i) => i !== index);
 		setOpenFiles(updatedOpenFiles);
 		setActiveFile(updatedOpenFiles.length > 0 ? 0 : null);
+	};
+
+	const handleCloseOthers = (index: number) => {
+		const updatedOpenFiles = [openFiles[index]];
+		setOpenFiles(updatedOpenFiles);
+		setActiveFile(0);
+	};
+
+	const handleCloseRight = (index: number) => {
+		const updatedOpenFiles = openFiles.slice(0, index + 1);
+		setOpenFiles(updatedOpenFiles);
+		setActiveFile(index);
 	};
 
 	const handleToggleFiles = () => {
@@ -261,14 +302,16 @@ export default function Home() {
 					onRun={handleRun}
 					onOpenSettings={() => setIsSettingsOpen(true)}
 					onOpenMarketplace={handleToggleMarketplace}
-					onImportSettings={handleImportSettings} // <-- Pass the new handler
-					onExportSettings={handleExportSettings} // <-- Pass the new handler
+					onImportSettings={handleImportSettings}
+					onExportSettings={handleExportSettings}
 					theme={theme}
 				/>
 				{isFileListOpen && (
 					<FileList
 						files={files}
 						onOpenFile={handleOpenFile}
+						onRenameFile={handleRenameFile}
+						onDownloadFile={handleDownloadFile}
 						theme={theme}
 					/>
 				)}
@@ -290,6 +333,9 @@ export default function Home() {
 					activeFile={activeFile}
 					onSelectFile={setActiveFile}
 					onCloseFile={handleCloseFile}
+					onDownloadFile={handleDownloadFile}
+					onCloseOthers={handleCloseOthers}
+					onCloseRight={handleCloseRight}
 					theme={theme}
 				/>
 				<div

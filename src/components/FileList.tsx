@@ -1,4 +1,5 @@
 import { FaHtml5, FaCss3Alt, FaJsSquare, FaRegFileAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 interface FileListProps {
 	files: {
@@ -7,27 +8,52 @@ interface FileListProps {
 		type: "html" | "css" | "javascript";
 	}[];
 	onOpenFile: (index: number) => void;
+	onRenameFile: (index: number, newName: string) => void;
+	onDownloadFile: (index: number) => void;
 	theme: string;
 }
 
-export default function FileList({ files, onOpenFile, theme }: FileListProps) {
-	const getFileIcon = (type: string) => {
-		switch (type) {
-			case "html":
-				return <FaHtml5 className="mr-2" />;
-			case "css":
-				return <FaCss3Alt className="mr-2" />;
-			case "javascript":
-				return <FaJsSquare className="mr-2" />;
-			default:
-				return <FaRegFileAlt className="mr-2" />;
-		}
+export default function FileList({
+	files,
+	onOpenFile,
+	onRenameFile,
+	onDownloadFile,
+	theme,
+}: FileListProps) {
+	const [contextMenu, setContextMenu] = useState<{
+		index: number;
+		x: number;
+		y: number;
+	} | null>(null);
+
+	useEffect(() => {
+		const handleClickOutside = () => {
+			setContextMenu(null);
+		};
+
+		window.addEventListener("click", handleClickOutside);
+		return () => {
+			window.removeEventListener("click", handleClickOutside);
+		};
+	}, []);
+
+	const handleRightClick = (event: React.MouseEvent, index: number) => {
+		event.preventDefault();
+		setContextMenu({ index, x: event.clientX, y: event.clientY });
 	};
 
-	// Ensure files is an array
-	if (!Array.isArray(files)) {
-		return <div>No files available.</div>;
-	}
+	const handleRename = (index: number) => {
+		const newName = prompt("Enter the new file name:");
+		if (newName) {
+			onRenameFile(index, newName);
+		}
+		setContextMenu(null);
+	};
+
+	const handleDownload = (index: number) => {
+		onDownloadFile(index);
+		setContextMenu(null);
+	};
 
 	return (
 		<div
@@ -48,12 +74,60 @@ export default function FileList({ files, onOpenFile, theme }: FileListProps) {
 								: "hover:bg-gray-200"
 						}`}
 						onClick={() => onOpenFile(index)}
+						onContextMenu={(event) =>
+							handleRightClick(event, index)
+						}
 					>
 						{getFileIcon(file.type)}
 						{file.name}
 					</li>
 				))}
 			</ul>
+
+			{contextMenu && (
+				<div
+					className={`fixed z-50 ${
+						theme === "vs-dark"
+							? "bg-gray-800 text-white"
+							: "bg-white text-black"
+					} border shadow-lg p-2 rounded-md`}
+					style={{ top: contextMenu.y, left: contextMenu.x }}
+				>
+					<button
+						onClick={() => handleRename(contextMenu.index)}
+						className={`block w-full text-left p-2 ${
+							theme === "vs-dark"
+								? "hover:bg-gray-700"
+								: "hover:bg-gray-200"
+						}`}
+					>
+						Rename
+					</button>
+					<button
+						onClick={() => handleDownload(contextMenu.index)}
+						className={`block w-full text-left p-2 ${
+							theme === "vs-dark"
+								? "hover:bg-gray-700"
+								: "hover:bg-gray-200"
+						}`}
+					>
+						Download
+					</button>
+				</div>
+			)}
 		</div>
 	);
+}
+
+function getFileIcon(type: string) {
+	switch (type) {
+		case "html":
+			return <FaHtml5 className="mr-2" />;
+		case "css":
+			return <FaCss3Alt className="mr-2" />;
+		case "javascript":
+			return <FaJsSquare className="mr-2" />;
+		default:
+			return <FaRegFileAlt className="mr-2" />;
+	}
 }
