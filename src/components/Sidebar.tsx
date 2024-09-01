@@ -65,56 +65,6 @@ export default function Sidebar({
 					: "bg-code-gray-200 text-black"
 			}`}
 		>
-			{/* Existing buttons */}
-			<button
-				type="button"
-				data-tooltip-id="tooltip-marketplace"
-				onClick={onOpenMarketplace} // <-- Hook up the new marketplace button
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
-			>
-				<FaStore size={36} />
-			</button>
-			<Tooltip id="tooltip-marketplace" place="right">
-				Marketplace
-			</Tooltip>
-
-			<button
-				type="button"
-				data-tooltip-id="tooltip-import-settings"
-				onClick={onImportSettings} // <-- Hook up the new import settings button
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
-			>
-				<FaUpload size={36} />
-			</button>
-			<Tooltip id="tooltip-import-settings" place="right">
-				Import Settings
-			</Tooltip>
-
-			<button
-				type="button"
-				data-tooltip-id="tooltip-export-settings"
-				onClick={onExportSettings} // <-- Hook up the new export settings button
-				className={`p-2 rounded-md ${
-					theme === "vs-dark"
-						? "hover:bg-gray-700"
-						: "hover:bg-gray-200"
-				}`}
-			>
-				<FaDownload size={36} />
-			</button>
-			<Tooltip id="tooltip-export-settings" place="right">
-				Export Settings
-			</Tooltip>
-
-			{/* Other existing buttons */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-files"
@@ -177,6 +127,54 @@ export default function Sidebar({
 			</button>
 			<Tooltip id="tooltip-add-js" place="right">
 				Add JS File
+			</Tooltip>
+
+			<button
+				type="button"
+				data-tooltip-id="tooltip-marketplace"
+				onClick={onOpenMarketplace} // <-- Hook up the new marketplace button
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
+			>
+				<FaStore size={36} />
+			</button>
+			<Tooltip id="tooltip-marketplace" place="right">
+				Marketplace
+			</Tooltip>
+
+			<button
+				type="button"
+				data-tooltip-id="tooltip-import-settings"
+				onClick={onImportSettings} // <-- Hook up the new import settings button
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
+			>
+				<FaUpload size={36} />
+			</button>
+			<Tooltip id="tooltip-import-settings" place="right">
+				Import Settings
+			</Tooltip>
+
+			<button
+				type="button"
+				data-tooltip-id="tooltip-export-settings"
+				onClick={onExportSettings} // <-- Hook up the new export settings button
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
+			>
+				<FaDownload size={36} />
+			</button>
+			<Tooltip id="tooltip-export-settings" place="right">
+				Export Settings
 			</Tooltip>
 
 			{/* Use the ImportButton component for the Import functionality */}
