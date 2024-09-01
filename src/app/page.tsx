@@ -92,6 +92,13 @@ export default function Home() {
 		}
 	};
 
+	const handleDeleteFile = (index: number) => {
+		const updatedFiles = files.filter((_, i) => i !== index);
+		setFiles(updatedFiles);
+		setOpenFiles(openFiles.filter((_, i) => i !== index));
+		setActiveFile(updatedFiles.length > 0 ? 0 : null);
+	};
+
 	const handleFileChange = (index: number, content: string) => {
 		const updatedFiles = [...files];
 		updatedFiles[index].content = content;
@@ -253,6 +260,10 @@ export default function Home() {
 		downloadAnchorNode.remove();
 	};
 
+	const handleReorderFiles = (newOrder: any[]) => {
+		setOpenFiles(newOrder);
+	};
+
 	useEffect(() => {
 		const loadEnabledExtensions = async () => {
 			for (const extension of extensions) {
@@ -312,6 +323,7 @@ export default function Home() {
 						onOpenFile={handleOpenFile}
 						onRenameFile={handleRenameFile}
 						onDownloadFile={handleDownloadFile}
+						onDeleteFile={handleDeleteFile} // Pass delete handler
 						theme={theme}
 					/>
 				)}
@@ -334,8 +346,10 @@ export default function Home() {
 					onSelectFile={setActiveFile}
 					onCloseFile={handleCloseFile}
 					onDownloadFile={handleDownloadFile}
+					onDeleteFile={handleDeleteFile} // Pass delete handler
 					onCloseOthers={handleCloseOthers}
 					onCloseRight={handleCloseRight}
+					onReorderFiles={handleReorderFiles}
 					theme={theme}
 				/>
 				<div
