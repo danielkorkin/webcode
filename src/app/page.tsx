@@ -264,6 +264,25 @@ export default function Home() {
 		setOpenFiles(newOrder);
 	};
 
+	const convertTabsToSpaces = () => {
+		const updatedFiles = files.map((file) => {
+			const newContent = file.content.replace(/\t/g, " ".repeat(tabSize));
+			return { ...file, content: newContent };
+		});
+		setFiles(updatedFiles);
+		setOpenFiles(updatedFiles);
+	};
+
+	const convertSpacesToTabs = () => {
+		const updatedFiles = files.map((file) => {
+			const spaceRegex = new RegExp(` {${tabSize}}`, "g");
+			const newContent = file.content.replace(spaceRegex, "\t");
+			return { ...file, content: newContent };
+		});
+		setFiles(updatedFiles);
+		setOpenFiles(updatedFiles);
+	};
+
 	useEffect(() => {
 		const loadEnabledExtensions = async () => {
 			for (const extension of extensions) {
@@ -390,6 +409,8 @@ export default function Home() {
 				useTabs={useTabs}
 				onTabSizeChange={setTabSize}
 				onUseTabsChange={setUseTabs}
+				onConvertTabsToSpaces={convertTabsToSpaces} // Pass conversion handler
+				onConvertSpacesToTabs={convertSpacesToTabs} // Pass conversion handler
 			/>
 		</div>
 	);

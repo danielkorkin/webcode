@@ -13,6 +13,8 @@ interface SettingsPopupProps {
 	useTabs: boolean;
 	onTabSizeChange: (size: number) => void;
 	onUseTabsChange: (useTabs: boolean) => void;
+	onConvertTabsToSpaces: () => void; // New prop for converting tabs to spaces
+	onConvertSpacesToTabs: () => void; // New prop for converting spaces to tabs
 }
 
 export default function SettingsPopup({
@@ -28,6 +30,8 @@ export default function SettingsPopup({
 	useTabs,
 	onTabSizeChange,
 	onUseTabsChange,
+	onConvertTabsToSpaces, // New prop
+	onConvertSpacesToTabs, // New prop
 }: SettingsPopupProps) {
 	if (!isOpen) return null;
 
@@ -39,76 +43,6 @@ export default function SettingsPopup({
 		currentTheme === "vs-dark"
 			? "bg-gray-700 text-white border-gray-600"
 			: "bg-gray-100 text-black border-gray-300";
-
-	const renderUIComponents = (extension: any) => {
-		return extension.uiComponents?.map((component: any, index: number) => {
-			switch (component.type) {
-				case "button":
-					return (
-						<div key={index} className="mb-2">
-							<button
-								className="bg-blue-500 text-white px-4 py-2 rounded-md"
-								onClick={() =>
-									onExecuteFile(
-										extension.value,
-										component.onClickFile,
-									)
-								}
-							>
-								{component.label}
-							</button>
-						</div>
-					);
-				case "select":
-					return (
-						<div key={index} className="mb-2">
-							<label className="block text-sm font-medium mb-1">
-								{component.label}
-							</label>
-							<select
-								defaultValue="" // Set a default value
-								className={`mt-1 block w-full p-2 rounded-md shadow-sm ${selectClasses}`}
-								onChange={(e) =>
-									onExecuteFile(
-										extension.value,
-										component.onChangeFile,
-									)
-								}
-							>
-								<option value="" disabled>
-									Select a file
-								</option>
-								{openFiles.map((file, i) => (
-									<option key={i} value={file.name}>
-										{file.name}
-									</option>
-								))}
-							</select>
-						</div>
-					);
-				case "textInput":
-					return (
-						<div key={index} className="mb-2">
-							<label className="block text-sm font-medium mb-1">
-								{component.label}
-							</label>
-							<input
-								type="text"
-								className={`mt-1 block w-full p-2 rounded-md shadow-sm ${selectClasses}`}
-								onChange={(e) =>
-									onExecuteFile(
-										extension.value,
-										component.onChangeFile,
-									)
-								}
-							/>
-						</div>
-					);
-				default:
-					return null;
-			}
-		});
-	};
 
 	return (
 		<div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
@@ -136,6 +70,7 @@ export default function SettingsPopup({
 					<input
 						type="number"
 						value={tabSize}
+						min={1}
 						onChange={(e) =>
 							onTabSizeChange(Number(e.target.value))
 						}
@@ -152,6 +87,20 @@ export default function SettingsPopup({
 						onChange={(e) => onUseTabsChange(e.target.checked)}
 						className="form-checkbox h-5 w-5 text-blue-600"
 					/>
+				</div>
+				<div className="mb-4">
+					<button
+						onClick={onConvertTabsToSpaces}
+						className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mb-2"
+					>
+						Convert Tabs to Spaces
+					</button>
+					<button
+						onClick={onConvertSpacesToTabs}
+						className="w-full bg-blue-500 text-white px-4 py-2 rounded-md"
+					>
+						Convert Spaces to Tabs
+					</button>
 				</div>
 				<div className="mb-4">
 					<h3 className="text-lg font-bold">Extensions</h3>

@@ -42,16 +42,12 @@ export default function CodeEditor({
 			<Editor
 				height="100%"
 				language={language}
-				value={
-					typeof content === "object"
-						? JSON.stringify(content, null, "\t")
-						: content
-				}
+				value={content}
 				theme={theme}
 				onChange={handleEditorChange}
 				options={{
 					tabSize: tabSize,
-					insertSpaces: !useTabs,
+					insertSpaces: !useTabs, // Correct setting for spaces vs tabs
 					scrollBeyondLastLine: false,
 				}}
 			/>
