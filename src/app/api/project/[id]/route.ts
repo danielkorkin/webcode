@@ -1,4 +1,3 @@
-// src/app/api/project/[id]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -17,11 +16,22 @@ export async function GET(
 		);
 	}
 
-	// Indicate if the password is required (for existing projects)
-	const requiresPassword = project.type !== "public";
+	// Parse the code JSON string into an array
+	let code = [];
+	try {
+		code = JSON.parse(project.code || "[]");
+	} catch (error) {
+		console.error("Failed to parse project code:", error);
+		return NextResponse.json(
+			{ error: "Failed to parse project code" },
+			{ status: 500 },
+		);
+	}
 
+	// Return the project with the parsed code
+	const requiresPassword = project.type !== "public";
 	return NextResponse.json({
-		project,
+		project: { ...project, code },
 		requiresPassword,
 	});
 }

@@ -7,7 +7,7 @@ export async function PUT(
 ) {
 	let data;
 	try {
-		data = await req.json(); // This is where the error occurs if the JSON is invalid
+		data = await req.json(); // Parsing the JSON data from the request
 	} catch (error) {
 		console.error("Failed to parse JSON:", error);
 		return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
@@ -15,13 +15,30 @@ export async function PUT(
 
 	const { code, settings } = data;
 
-	const codeString = Array.isArray(code) ? code.join("") : code; // Ensure it's a string
+	// Debugging: Log the received code to verify its type and value
+	console.log("Received code:", code);
+
+	// Ensure code is stored as a string
+	let codeString = "";
+
+	if (typeof code === "string") {
+		codeString = code;
+	} else if (typeof code === "object" && code !== null) {
+		codeString = JSON.stringify(code); // Convert object to a JSON string
+	} else if (Array.isArray(code)) {
+		codeString = code.join(""); // Join array elements into a string
+	} else {
+		codeString = String(code); // Fallback: Convert anything else to a string
+	}
+
+	// Debugging: Log the final code string before saving
+	console.log("Processed codeString:", codeString);
 
 	try {
 		const project = await prisma.project.update({
 			where: { id: params.id },
 			data: {
-				code: codeString, // Pass the string version of code
+				code: codeString, // Save the string version of the code
 				settings: {
 					theme: settings.theme,
 					extensions: settings.extensions,

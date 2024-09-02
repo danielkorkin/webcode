@@ -11,7 +11,7 @@ import CodeEditor from "@/components/CodeEditor";
 const MonacoEditor = dynamic(() => import("monaco-editor"), { ssr: false });
 
 export default function EditorUI({ projectData }) {
-	const [files, setFiles] = useState(projectData?.files || []);
+	const [files, setFiles] = useState(projectData?.code || []); // Use projectData.code
 	const [openFiles, setOpenFiles] = useState([]);
 	const [activeFile, setActiveFile] = useState<number | null>(null);
 	const [isFileListOpen, setIsFileListOpen] = useState(false);
