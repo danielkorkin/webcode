@@ -377,7 +377,7 @@ export default function EditorUI({ projectData }) {
 					onAddFile={handleAddFile}
 					onImport={handleImport}
 					onExport={handleExport}
-					onRun={() => router.push(`/result/${projectData.id}`)}
+					onRun={() => router.push(`/${projectData.id}/result`)} // Corrected URL
 					onOpenSettings={() => setIsSettingsOpen(true)}
 					onOpenMarketplace={handleToggleMarketplace}
 					onImportSettings={handleImportSettings}
