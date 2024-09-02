@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import EditorUI from "@/components/EditorUI"; // The main UI component
+import { ImSpinner2 } from "react-icons/im"; // Import a spinner icon
 
 export default function EditorPage() {
 	const { slug } = useParams();
@@ -46,24 +47,43 @@ export default function EditorPage() {
 		}
 	};
 
+	// Show loading spinner while project data is being fetched
 	if (!projectData) {
-		return <div>Loading...</div>;
+		return (
+			<div className="flex h-screen items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-700">
+				<div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full flex items-center justify-center">
+					<ImSpinner2 className="animate-spin text-4xl text-blue-600" />
+				</div>
+			</div>
+		);
 	}
 
 	if (requiresPassword && !isAuthenticated) {
 		return (
-			<div className="flex h-screen items-center justify-center">
-				<div className="space-y-4">
+			<div className="flex h-screen items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-700">
+				<div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full text-center">
+					<h2 className="text-2xl font-semibold mb-4 text-gray-800">
+						Project Password Required
+					</h2>
+					<p className="text-gray-600 mb-6">
+						Please enter the project password to access this
+						project.
+					</p>
 					<input
 						type="password"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						placeholder="Enter Project Password"
-						className="p-2 border border-gray-400 rounded-md"
+						className="w-full p-3 border border-gray-300 rounded-md mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
+					<p className="text-sm text-gray-500 mb-6">
+						Default password is{" "}
+						<span className="font-semibold">password123</span>. You
+						can change it in the settings.
+					</p>
 					<button
 						onClick={handlePasswordSubmit}
-						className="btn btn-primary"
+						className="w-full py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition"
 					>
 						Submit
 					</button>
