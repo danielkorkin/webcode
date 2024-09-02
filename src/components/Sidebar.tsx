@@ -9,9 +9,10 @@ import {
 	FaHtml5,
 	FaCss3Alt,
 	FaJsSquare,
-	FaStore, // <-- Import the new icon for the marketplace
+	FaStore,
 	FaDownload,
 	FaUpload,
+	FaSave, // <-- Icon for save button
 } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
@@ -30,9 +31,10 @@ interface SidebarProps {
 	onExport: () => void;
 	onRun: () => void;
 	onOpenSettings: () => void;
-	onOpenMarketplace: () => void; // <-- New prop for opening the marketplace
-	onImportSettings: () => void; // <-- New prop for importing settings
-	onExportSettings: () => void; // <-- New prop for exporting settings
+	onOpenMarketplace: () => void;
+	onImportSettings: () => void;
+	onExportSettings: () => void;
+	onSave: () => void; // <-- New prop for manual save
 	theme: string;
 }
 
@@ -43,9 +45,10 @@ export default function Sidebar({
 	onExport,
 	onRun,
 	onOpenSettings,
-	onOpenMarketplace, // <-- Add the new prop here
-	onImportSettings, // <-- Add the new prop here
-	onExportSettings, // <-- Add the new prop here
+	onOpenMarketplace,
+	onImportSettings,
+	onExportSettings,
+	onSave, // <-- Use the new prop
 	theme,
 }: SidebarProps) {
 	const handleAddFile = (type: "html" | "css" | "javascript") => {
@@ -65,6 +68,7 @@ export default function Sidebar({
 					: "bg-code-gray-200 text-black"
 			}`}
 		>
+			{/* Toggle Files Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-files"
@@ -81,6 +85,7 @@ export default function Sidebar({
 				Toggle Files
 			</Tooltip>
 
+			{/* Add HTML File Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-add-html"
@@ -97,6 +102,7 @@ export default function Sidebar({
 				Add HTML File
 			</Tooltip>
 
+			{/* Add CSS File Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-add-css"
@@ -113,6 +119,7 @@ export default function Sidebar({
 				Add CSS File
 			</Tooltip>
 
+			{/* Add JS File Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-add-js"
@@ -129,6 +136,7 @@ export default function Sidebar({
 				Add JS File
 			</Tooltip>
 
+			{/* Marketplace Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-marketplace"
@@ -145,6 +153,7 @@ export default function Sidebar({
 				Marketplace
 			</Tooltip>
 
+			{/* Import Settings Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-import-settings"
@@ -161,6 +170,7 @@ export default function Sidebar({
 				Import Settings
 			</Tooltip>
 
+			{/* Export Settings Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-export-settings"
@@ -180,6 +190,7 @@ export default function Sidebar({
 			{/* Use the ImportButton component for the Import functionality */}
 			<ImportButton onImport={onImport} theme={theme} />
 
+			{/* Export Project Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-export"
@@ -196,6 +207,24 @@ export default function Sidebar({
 				Export Project
 			</Tooltip>
 
+			{/* Manual Save Button */}
+			<button
+				type="button"
+				data-tooltip-id="tooltip-save"
+				onClick={onSave} // <-- Hook up the save button
+				className={`p-2 rounded-md ${
+					theme === "vs-dark"
+						? "hover:bg-gray-700"
+						: "hover:bg-gray-200"
+				}`}
+			>
+				<FaSave size={36} />
+			</button>
+			<Tooltip id="tooltip-save" place="right">
+				Save Project
+			</Tooltip>
+
+			{/* Run Project Button */}
 			<button
 				type="button"
 				data-tooltip-id="tooltip-run"

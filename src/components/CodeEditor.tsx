@@ -32,7 +32,6 @@ export default function CodeEditor({
 
 	useEffect(() => {
 		if (editorContainerRef.current) {
-			// Set the height of the editor container dynamically
 			editorContainerRef.current.style.height = `calc(100vh - 10px)`;
 		}
 	}, []);
@@ -47,7 +46,7 @@ export default function CodeEditor({
 				onChange={handleEditorChange}
 				options={{
 					tabSize: tabSize,
-					insertSpaces: !useTabs, // Correct setting for spaces vs tabs
+					insertSpaces: !useTabs,
 					scrollBeyondLastLine: false,
 				}}
 			/>
