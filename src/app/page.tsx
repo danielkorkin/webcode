@@ -109,9 +109,13 @@ export default function Home() {
 	};
 
 	const handleFileChange = (index: number, content: string) => {
+		const file = files[index];
+		if (file.content === content) return; // Skip unnecessary updates
+
 		const updatedFiles = [...files];
 		updatedFiles[index].content = content;
 		setFiles(updatedFiles);
+
 		const openIndex = openFiles.findIndex(
 			(file) => file.name === updatedFiles[index].name,
 		);

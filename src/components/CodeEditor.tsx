@@ -23,33 +23,44 @@ export default function CodeEditor({
 	onChange,
 }: EditorProps) {
 	const editorContainerRef = useRef<HTMLDivElement>(null);
+	const editorRef = useRef<any>(null);
 
 	const handleEditorChange = (value: string | undefined) => {
-		if (value !== undefined) {
+		if (value !== undefined && value !== content) {
 			onChange(value);
 		}
 	};
 
 	useEffect(() => {
 		if (editorContainerRef.current) {
-			// Set the height of the editor container dynamically
 			editorContainerRef.current.style.height = `calc(100vh - 10px)`;
 		}
 	}, []);
 
+	useEffect(() => {
+		if (editorRef.current) {
+			const model = editorRef.current.getModel();
+			if (model && model.getValue() !== content) {
+				model.setValue(content);
+			}
+		}
+	}, [content]);
+
 	return (
 		<div ref={editorContainerRef} className="flex-1 pb-2">
 			<Editor
-				key={content} // Use the content as a key to force re-rendering when content changes
 				height="100%"
 				language={language}
-				value={content}
 				theme={theme}
+				value={content}
 				onChange={handleEditorChange}
 				options={{
 					tabSize: tabSize,
-					insertSpaces: !useTabs, // Correct setting for spaces vs tabs
+					insertSpaces: !useTabs,
 					scrollBeyondLastLine: false,
+				}}
+				onMount={(editor) => {
+					editorRef.current = editor;
 				}}
 			/>
 		</div>

@@ -74,6 +74,7 @@ export default function SettingsPopup({
 								{component.label}
 							</label>
 							<select
+								defaultValue="" // Set the default value to an empty string
 								onChange={(e) =>
 									onExecuteFile(
 										extension.value,
@@ -83,6 +84,8 @@ export default function SettingsPopup({
 								}
 								className={`mt-1 block w-full p-2 rounded-md shadow-sm ${selectClasses}`}
 							>
+								<option value="">No file selected</option>{" "}
+								{/* Default option */}
 								{openFiles.map((file, i) => (
 									<option key={i} value={file.name}>
 										{file.name}
