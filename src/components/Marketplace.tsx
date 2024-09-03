@@ -1,15 +1,7 @@
-// src/components/Marketplace.tsx
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { FaDownload } from "react-icons/fa";
-
-interface Extension {
-	title: string;
-	description: string;
-	icon: string;
-	files: string[];
-	enabled: boolean;
-	uiComponents: any[]; // Extend to include UI components and actions
-}
+import { Extension } from "@/types";
 
 export default function Marketplace({
 	onInstallExtension,
@@ -32,6 +24,11 @@ export default function Marketplace({
 		fetchExtensions();
 	}, []);
 
+	const handleInstallClick = (extension: Extension) => {
+		// Install the extension without executing it
+		onInstallExtension({ ...extension, enabled: false });
+	};
+
 	return (
 		<div
 			className={`w-64 h-screen p-4 shadow-lg ${
@@ -44,7 +41,7 @@ export default function Marketplace({
 			<ul>
 				{extensions.map((extension) => {
 					const isInstalled = installedExtensions.some(
-						(ext) => ext.title === extension.title
+						(ext) => ext.title === extension.title,
 					);
 					return (
 						<li
@@ -55,9 +52,11 @@ export default function Marketplace({
 									: "bg-gray-200 text-black"
 							}`}
 						>
-							<img
+							<Image
 								src={extension.icon}
 								alt={extension.title}
+								width={32}
+								height={32}
 								className="h-8 w-8"
 							/>
 							<h4 className="font-bold">{extension.title}</h4>
@@ -71,7 +70,7 @@ export default function Marketplace({
 									<button
 										className="bg-green-500 text-white p-2 rounded-md"
 										onClick={() =>
-											onInstallExtension(extension)
+											handleInstallClick(extension)
 										}
 									>
 										<FaDownload /> Install

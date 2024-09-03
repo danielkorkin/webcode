@@ -1,20 +1,25 @@
 import React from "react";
+import { Extension } from "@/types";
 
 interface SettingsPopupProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onThemeChange: (theme: string) => void;
 	currentTheme: string;
-	extensions: any[];
-	onToggleExtension: (title: string) => void;
-	onExecuteFile: (extensionTitle: string, file: string) => void;
+	extensions: Extension[];
+	onToggleExtension: (value: string) => void;
+	onExecuteFile: (
+		extensionValue: string,
+		file: string,
+		selectedFileName?: string,
+	) => void;
 	openFiles: any[];
 	tabSize: number;
 	useTabs: boolean;
 	onTabSizeChange: (size: number) => void;
 	onUseTabsChange: (useTabs: boolean) => void;
-	onConvertTabsToSpaces: () => void; // New prop for converting tabs to spaces
-	onConvertSpacesToTabs: () => void; // New prop for converting spaces to tabs
+	onConvertTabsToSpaces: () => void;
+	onConvertSpacesToTabs: () => void;
 }
 
 export default function SettingsPopup({
@@ -30,8 +35,8 @@ export default function SettingsPopup({
 	useTabs,
 	onTabSizeChange,
 	onUseTabsChange,
-	onConvertTabsToSpaces, // New prop
-	onConvertSpacesToTabs, // New prop
+	onConvertTabsToSpaces,
+	onConvertSpacesToTabs,
 }: SettingsPopupProps) {
 	if (!isOpen) return null;
 
@@ -43,6 +48,54 @@ export default function SettingsPopup({
 		currentTheme === "vs-dark"
 			? "bg-gray-700 text-white border-gray-600"
 			: "bg-gray-100 text-black border-gray-300";
+
+	const renderUIComponents = (extension: Extension) => {
+		return extension.uiComponents.map((component, index) => {
+			switch (component.type) {
+				case "button":
+					return (
+						<button
+							key={index}
+							onClick={() =>
+								onExecuteFile(
+									extension.value,
+									component.onClickFile,
+								)
+							}
+							className="bg-blue-500 text-white px-4 py-2 rounded-md mb-2"
+						>
+							{component.label}
+						</button>
+					);
+				case "select":
+					return (
+						<div key={index} className="mb-4">
+							<label className="block text-sm font-medium mb-2">
+								{component.label}
+							</label>
+							<select
+								onChange={(e) =>
+									onExecuteFile(
+										extension.value,
+										component.onChangeFile,
+										e.target.value, // Pass the selected file name
+									)
+								}
+								className={`mt-1 block w-full p-2 rounded-md shadow-sm ${selectClasses}`}
+							>
+								{openFiles.map((file, i) => (
+									<option key={i} value={file.name}>
+										{file.name}
+									</option>
+								))}
+							</select>
+						</div>
+					);
+				default:
+					return null;
+			}
+		});
+	};
 
 	return (
 		<div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">

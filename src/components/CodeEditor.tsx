@@ -40,6 +40,7 @@ export default function CodeEditor({
 	return (
 		<div ref={editorContainerRef} className="flex-1 pb-2">
 			<Editor
+				key={content} // Use the content as a key to force re-rendering when content changes
 				height="100%"
 				language={language}
 				value={content}

@@ -10,7 +10,9 @@ export default function ResultPage() {
 	>([]);
 
 	useEffect(() => {
-		const savedFiles = localStorage.getItem(slug!);
+		// Ensure slug is a string
+		const slugString = Array.isArray(slug) ? slug[0] : slug;
+		const savedFiles = localStorage.getItem(slugString);
 		if (savedFiles) {
 			setFiles(JSON.parse(savedFiles));
 		}
@@ -31,13 +33,14 @@ export default function ResultPage() {
 				if (href) {
 					linkedStylesheets.push(href);
 				}
-			}
+			},
 		);
 
 		const cssContent = files
 			.filter(
 				(file) =>
-					file.type === "css" && linkedStylesheets.includes(file.name)
+					file.type === "css" &&
+					linkedStylesheets.includes(file.name),
 			)
 			.map((file) => file.content)
 			.join("\n");

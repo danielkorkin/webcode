@@ -16,7 +16,7 @@ interface FileTabsProps {
 	onSelectFile: (index: number) => void;
 	onCloseFile: (index: number) => void;
 	onDownloadFile: (index: number) => void;
-	onDeleteFile: (index: number) => void; // New prop for deleting files
+	onDeleteFile: (index: number) => void;
 	onCloseOthers: (index: number) => void;
 	onCloseRight: (index: number) => void;
 	onReorderFiles: (newOrder: any[]) => void;
@@ -29,7 +29,7 @@ export default function FileTabs({
 	onSelectFile,
 	onCloseFile,
 	onDownloadFile,
-	onDeleteFile, // New prop
+	onDeleteFile,
 	onCloseOthers,
 	onCloseRight,
 	onReorderFiles,
@@ -41,7 +41,7 @@ export default function FileTabs({
 		y: number;
 	} | null>(null);
 	const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-	const [deleteIndex, setDeleteIndex] = useState<number | null>(null); // Track which file to delete
+	const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
 	const tabsRef = useRef<HTMLDivElement | null>(null);
 
@@ -95,7 +95,7 @@ export default function FileTabs({
 
 		const elements = tabsRef.current.querySelectorAll(
 			"[data-draggable-id]",
-		);
+		) as NodeListOf<HTMLElement>;
 
 		const unmonitors = Array.from(elements).map((element, index) => {
 			return draggable({
@@ -116,16 +116,16 @@ export default function FileTabs({
 					getIsSticky: () => true, // Allow stickiness for better interaction
 					canDrop: ({ source }) => {
 						// Only allow dropping in adjacent positions
-						const sourceIndex = source.data.index;
+						const sourceIndex = source.data.index as number;
 						return Math.abs(sourceIndex - index) === 1;
 					},
 					onDrop: ({ location, source }) => {
 						if (!location.current.dropTargets.length) {
 							return;
 						}
-						const targetIndex =
-							location.current.dropTargets[0].data.index;
-						const sourceIndex = source.data.index;
+						const targetIndex = location.current.dropTargets[0].data
+							.index as number;
+						const sourceIndex = source.data.index as number;
 
 						if (targetIndex !== sourceIndex) {
 							const reorderedFiles = reorder({
@@ -227,7 +227,7 @@ export default function FileTabs({
 							Delete
 						</button>
 						<button
-							onClick={() => handleCloseOthers(contextMenu.index)}
+							onClick={() => onCloseOthers(contextMenu.index)}
 							className={`block w-full text-left p-2 ${
 								theme === "vs-dark"
 									? "hover:bg-gray-700"
@@ -237,7 +237,7 @@ export default function FileTabs({
 							Close Other Tabs
 						</button>
 						<button
-							onClick={() => handleCloseRight(contextMenu.index)}
+							onClick={() => onCloseRight(contextMenu.index)}
 							className={`block w-full text-left p-2 ${
 								theme === "vs-dark"
 									? "hover:bg-gray-700"

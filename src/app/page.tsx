@@ -3,27 +3,35 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
-import dynamic from "next/dynamic";
 import Sidebar from "@/components/Sidebar";
 import FileList from "@/components/FileList";
 import FileTabs from "@/components/FileTabs";
 import SettingsPopup from "@/components/SettingsPopup";
 import Marketplace from "@/components/Marketplace";
 import CodeEditor from "@/components/CodeEditor";
+import { Extension, File } from "@/types"; // Import the shared Extension type
 
-const MonacoEditor = dynamic(() => import("monaco-editor"), { ssr: false });
+// Monaco editor cannot be dynamically imported as a React component.
+// Instead, we'll load it and interact with it via useEffect.
+let monaco: any = null;
+
+if (typeof window !== "undefined") {
+	import("monaco-editor").then((module) => {
+		monaco = module;
+	});
+}
 
 export default function Home() {
-	const [files, setFiles] = useState([]);
-	const [openFiles, setOpenFiles] = useState([]);
+	const [files, setFiles] = useState<File[]>([]);
+	const [openFiles, setOpenFiles] = useState<File[]>([]);
 	const [activeFile, setActiveFile] = useState<number | null>(null);
 	const [isFileListOpen, setIsFileListOpen] = useState(false);
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 	const [isMarketplaceOpen, setIsMarketplaceOpen] = useState(false);
-	const [extensions, setExtensions] = useState([]);
+	const [extensions, setExtensions] = useState<Extension[]>([]);
 	const [theme, setTheme] = useState("vs-dark");
-	const [tabSize, setTabSize] = useState(4); // Default tab size
-	const [useTabs, setUseTabs] = useState(false); // Default to spaces
+	const [tabSize, setTabSize] = useState(4);
+	const [useTabs, setUseTabs] = useState(false);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -32,7 +40,6 @@ export default function Home() {
 			if (typeof window !== "undefined" && isMounted) {
 				const storedTheme = localStorage.getItem("theme") || "vs-dark";
 				setTheme(storedTheme);
-				const monaco = await import("monaco-editor");
 				if (monaco && monaco.editor) {
 					monaco.editor.setTheme(storedTheme as "vs" | "vs-dark");
 				}
@@ -48,7 +55,6 @@ export default function Home() {
 		const updateTheme = async () => {
 			if (typeof window !== "undefined") {
 				localStorage.setItem("theme", theme);
-				const monaco = await import("monaco-editor");
 				if (monaco && monaco.editor) {
 					monaco.editor.setTheme(theme as "vs" | "vs-dark");
 				}
@@ -57,8 +63,11 @@ export default function Home() {
 		updateTheme();
 	}, [theme]);
 
-	const handleAddFile = (name: string, type: string) => {
-		const newFile = { name, content: "", type };
+	const handleAddFile = (
+		name: string,
+		type: "html" | "css" | "javascript",
+	) => {
+		const newFile: File = { name, content: "", type };
 		setFiles([...files, newFile]);
 		handleOpenFile(files.length);
 	};
@@ -159,7 +168,7 @@ export default function Home() {
 		}
 	};
 
-	const handleImport = (importedFiles: any[]) => {
+	const handleImport = (importedFiles: File[]) => {
 		setFiles(importedFiles);
 		setActiveFile(importedFiles.length > 0 ? 0 : null);
 	};
@@ -182,7 +191,7 @@ export default function Home() {
 		setTheme(newTheme);
 	};
 
-	const handleInstallExtension = (extension: any) => {
+	const handleInstallExtension = (extension: Extension) => {
 		const isAlreadyInstalled = extensions.some(
 			(ext) => ext.value === extension.value,
 		);
@@ -191,10 +200,12 @@ export default function Home() {
 		}
 	};
 
-	const handleToggleExtension = (value: string) => {
-		setExtensions(
-			extensions.map((ext) =>
-				ext.value === value ? { ...ext, enabled: !ext.enabled } : ext,
+	const handleToggleExtension = (extensionValue: string) => {
+		setExtensions((prevExtensions) =>
+			prevExtensions.map((ext) =>
+				ext.value === extensionValue
+					? { ...ext, enabled: !ext.enabled }
+					: ext,
 			),
 		);
 	};
@@ -260,7 +271,7 @@ export default function Home() {
 		downloadAnchorNode.remove();
 	};
 
-	const handleReorderFiles = (newOrder: any[]) => {
+	const handleReorderFiles = (newOrder: File[]) => {
 		setOpenFiles(newOrder);
 	};
 
@@ -285,35 +296,10 @@ export default function Home() {
 
 	useEffect(() => {
 		const loadEnabledExtensions = async () => {
-			for (const extension of extensions) {
-				if (extension.enabled) {
-					for (const file of extension.files) {
-						try {
-							const extModule = await import(
-								`@/extensions/${extension.value}/${file}`
-							);
-							if (extModule && extModule.default) {
-								extModule.default({
-									files,
-									setFiles,
-									activeFile,
-									setActiveFile,
-									tabSize,
-									useTabs,
-								});
-							}
-						} catch (error) {
-							console.error(
-								`Failed to load file ${file} from extension ${extension.value}:`,
-								error,
-							);
-						}
-					}
-				}
-			}
+			// This effect is removed as it should not auto-execute anything
 		};
 		loadEnabledExtensions();
-	}, [extensions]);
+	}, [extensions, activeFile, files, tabSize, useTabs]);
 
 	return (
 		<div
